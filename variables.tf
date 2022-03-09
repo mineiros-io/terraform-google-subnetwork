@@ -9,29 +9,29 @@ variable "network" {
 }
 
 variable "name" {
-  type = string
+  type        = string
   description = "(Required) The name of this subnetwork, provided by the client when initially creating the resource. The name must be 1-63 characters long, and comply with [RFC1035](https://datatracker.ietf.org/doc/html/rfc1035). Specifically, the name must be 1-63 characters long and match the regular expression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash."
 
 }
 
 variable "description" {
-  type    = string
+  type        = string
   description = "(Optional) An optional description of this subnetwork. Provide this property when you create the resource. This field can be set only at resource creation time."
-  default = null
+  default     = null
 }
 
 variable "region" {
-  type = string
+  type        = string
   description = "(Required) The GCP region for this subnetwork."
 }
 variable "private_ip_google_access" {
-  type    = bool
+  type        = bool
   description = "(Optional) When enabled, VMs in this subnetwork without external IP addresses can access Google APIs and services by using Private Google Access."
-  default = true
+  default     = true
 
 }
 variable "ip_cidr_range" {
-  type = string
+  type        = string
   description = "(Required) The range of internal addresses that are owned by this subnetwork. Provide this property when you create the subnetwork. For example, 10.0.0.0/8 or 192.168.0.0/16. Ranges must be unique and non-overlapping within a network. Only IPv4 is supported."
 }
 
@@ -43,7 +43,7 @@ variable "secondary_ip_ranges" {
   #   ip_cidr_range = string
   # }))
   description = "An array of configurations for secondary IP ranges for VM instances contained in this subnetwork. The primary IP of such VM must belong to the primary ipCidrRange of the subnetwork. The alias IPs may belong to either primary or secondary ranges."
-  default = []
+  default     = []
 }
 
 variable "log_config" {
@@ -55,61 +55,8 @@ variable "log_config" {
   #   metadata_fields      = optional(list(string))
   #   filter_expr          = optional(string)
   # })
-  type = any
+  type    = any
   default = null
-}
-
-variable "subnets" {
-  # TODO: implement validation
-  description = "(Required) A list of subnets to be created with the VPC."
-  type        = any
-  # type = list(object({
-  #   project                  = optional(string)
-  #   name                     = string
-  #   description              = optional(string)
-  #   region                   = string
-  #   private_ip_google_access = optional(bool)
-  #   ip_cidr_range            = string
-  #   secondary_ip_range = optional(list(object({
-  #     range_name    = string
-  #     ip_cidr_range = string
-  #   })))
-  #   log_config = optional(object({
-  #     aggregation_interval = optional(string)
-  #     flow_sampling        = optional(number)
-  #     metadata             = optional(string)
-  #     metadata_fields      = optional(list(string))
-  #     filter_expr          = optional(string)
-  #   }))
-  # }))
-
-  # Example
-  #
-  # subnets = [
-  #   {
-  #     name                     = "kubernetes",
-  #     region                   = "europe-west1"
-  #     private_ip_google_access = false,
-  #     ip_cidr_range            = "10.0.0.0/20"
-  #     secondary_ip_ranges = [{
-  #       range_name    = "kubernetes-pods"
-  #       ip_cidr_range = "10.10.0.0/20"
-  #     }]
-  #     log_config = {
-  #       aggregation_interval = "INTERVAL_10_MIN"
-  #       flow_sampling        = 0.5
-  #       metadata             = "INCLUDE_ALL_METADATA"
-  #       metadat_fields       = null
-  #       filter_expr          = null
-  #     }
-  #   },
-  #   {
-  #     name                     = "test",
-  #     region                   = "europe-west1",
-  #     private_ip_google_access = false,
-  #     ip_cidr_range            = "10.20.0.0/16"
-  #   }
-  # ]
 }
 
 # ---------------------------------------------------------------------------------------------------------------------

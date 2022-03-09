@@ -235,9 +235,9 @@ The following attributes are exported in the outputs of the module:
 
   Whether this module is enabled.
 
-- [**`subnetworks`**](#output-subnetworks): *(`map(subnetwork)`)*<a name="output-subnetworks"></a>
+- [**`subnetwork`**](#output-subnetwork): *(`map(subnetwork)`)*<a name="output-subnetwork"></a>
 
-  The created subnet resources.
+  The created subnet resource.
 
 ## External Documentation
 

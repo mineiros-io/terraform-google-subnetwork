@@ -4,23 +4,13 @@
 # The purpose is to verify no resources are created when the module is disabled.
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-variable "aws_region" {
-  description = "(Optional) The AWS region in which all resources will be created."
-  type        = string
-  default     = "us-east-1"
-}
-
 terraform {
   required_providers {
     aws = {
-      source  = "hashicorp/aws"
-      version = "~> 3.0"
+      source  = "hashicorp/google"
+      version = "4.12.0"
     }
   }
-}
-
-provider "aws" {
-  region = var.aws_region
 }
 
 # DO NOT RENAME MODULE NAME
@@ -30,8 +20,18 @@ module "test" {
   module_enabled = false
 
   # add all required arguments
+  network       = "projects/test-project/global/networks/test-network"
+  name          = "test-subnetwork"
+  ip_cidr_range = "10.2.0.0/16"
+  region        = "us-central1"
 
   # add all optional arguments that create additional resources
+  secondary_ip_ranges = [
+    {
+      range_name    = "kubernetes-pods"
+      ip_cidr_range = "10.10.0.0/20"
+    }
+  ]
 }
 
 # outputs generate non-idempotent terraform plans so we disable them for now unless we need them.
