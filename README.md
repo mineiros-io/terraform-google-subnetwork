@@ -1,17 +1,17 @@
-[<img src="https://raw.githubusercontent.com/mineiros-io/brand/3bffd30e8bdbbde32c143e2650b2faa55f1df3ea/mineiros-primary-logo.svg" width="400"/>](https://mineiros.io/?ref=terraform-module-template)
+[<img src="https://raw.githubusercontent.com/mineiros-io/brand/3bffd30e8bdbbde32c143e2650b2faa55f1df3ea/mineiros-primary-logo.svg" width="400"/>](https://mineiros.io/?ref=terraform-google-subnetwork)
 
-[![Build Status](https://github.com/mineiros-io/terraform-module-template/workflows/Tests/badge.svg)](https://github.com/mineiros-io/terraform-module-template/actions)
-[![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/mineiros-io/terraform-module-template.svg?label=latest&sort=semver)](https://github.com/mineiros-io/terraform-module-template/releases)
+[![Build Status](https://github.com/mineiros-io/terraform-google-subnetwork/workflows/Tests/badge.svg)](https://github.com/mineiros-io/terraform-google-subnetwork/actions)
+[![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/mineiros-io/terraform-google-subnetwork.svg?label=latest&sort=semver)](https://github.com/mineiros-io/terraform-google-subnetwork/releases)
 [![Terraform Version](https://img.shields.io/badge/Terraform-1.x-623CE4.svg?logo=terraform)](https://github.com/hashicorp/terraform/releases)
-[![AWS Provider Version](https://img.shields.io/badge/AWS-3-F8991D.svg?logo=terraform)](https://github.com/terraform-providers/terraform-provider-aws/releases)
+[![Google Provider Version](https://img.shields.io/badge/google-4-1A73E8.svg?logo=terraform)](https://github.com/terraform-providers/terraform-provider-google/releases)
 [![Join Slack](https://img.shields.io/badge/slack-@mineiros--community-f32752.svg?logo=slack)](https://mineiros.io/slack)
 
-# terraform-module-template
+# terraform-google-subnetwork
 
-A [Terraform] module for [Amazon Web Services (AWS)][aws].
+A [Terraform](https://www.terraform.io) module to create a [Google Network Subnet](https://cloud.google.com/vpc/docs/vpc#vpc_networks_and_subnets) on [Google Cloud Services (GCP)](https://cloud.google.com/).
 
 **_This module supports Terraform version 1
-and is compatible with the Terraform AWS Provider version 3._**
+and is compatible with the Terraform Google Provider version 4._**
 
 This module is part of our Infrastructure as Code (IaC) framework
 that enables our users and customers to easily deploy and manage reusable,
@@ -21,14 +21,15 @@ secure, and production-grade cloud infrastructure.
 - [Module Features](#module-features)
 - [Getting Started](#getting-started)
 - [Module Argument Reference](#module-argument-reference)
-  - [Main Resource Configuration](#main-resource-configuration)
-  - [Module Configuration](#module-configuration)
+  - [Top-level Arguments](#top-level-arguments)
+    - [Module Configuration](#module-configuration)
+    - [Main Resource Configuration](#main-resource-configuration)
 - [Module Outputs](#module-outputs)
 - [External Documentation](#external-documentation)
-  - [AWS Documentation IAM](#aws-documentation-iam)
-  - [Terraform AWS Provider Documentation](#terraform-aws-provider-documentation)
+  - [Google Documentation](#google-documentation)
+  - [Terraform Google Provider Documentation](#terraform-google-provider-documentation)
 - [Module Versioning](#module-versioning)
-  - [Backwards compatibility in `0.0.z` and `0.y.z` version](#backwards-compatibility-in-00z-and-0yz-version)
+  - [Backwards compatibility in ` 0.0.z ` and ` 0.y.z ` version](#backwards-compatibility-in--00z--and--0yz--version)
 - [About Mineiros](#about-mineiros)
 - [Reporting Issues](#reporting-issues)
 - [Contributing](#contributing)
@@ -37,66 +38,41 @@ secure, and production-grade cloud infrastructure.
 
 ## Module Features
 
-This module implements the following Terraform resources:
-
-- `null_resource`
-
-and supports additional features of the following modules:
-
-- [mineiros-io/something/google](https://github.com/mineiros-io/terraform-google-something)
+A [Terraform] module for creating `google_compute_subnetwork` resources
+which create subnets for a specified VPC. Each VPC network is subdivided
+into subnets, and each subnet is contained within a single region.
+You can have more than one subnet in a region for a given VPC network.
+If no `log_config` is specified `default_log_config` with best practices will be applied.
 
 ## Getting Started
 
-Most common usage of the module:
+Most basic usage just setting required arguments:
 
 ```hcl
-module "terraform-module-template" {
-  source = "git@github.com:mineiros-io/terraform-module-template.git?ref=v0.0.1"
-}
+  module "terraform-google-subnetwork" {
+    source        = "github.com/mineiros-io/terraform-google-subnetwork.git?ref=v0.1.0"
+
+    network       = google_compute_network.custom-test.id
+    name          = "test-subnetwork"
+    ip_cidr_range = "10.2.0.0/16"
+    region        = "us-central1"
+
+    secondary_ip_ranges = [
+      {
+        range_name    = "kubernetes-pods"
+        ip_cidr_range = "10.10.0.0/20"
+      }
+    ]
+  }
 ```
 
 ## Module Argument Reference
 
 See [variables.tf] and [examples/] for details and use-cases.
 
-### Main Resource Configuration
+### Top-level Arguments
 
-- [**`example_required`**](#var-example_required): *(**Required** `string`)*<a name="var-example_required"></a>
-
-  The name of the resource
-
-- [**`example_name`**](#var-example_name): *(Optional `string`)*<a name="var-example_name"></a>
-
-  The name of the resource
-
-  Default is `"optional-resource-name"`.
-
-- [**`example_user_object`**](#var-example_user_object): *(Optional `object(user)`)*<a name="var-example_user_object"></a>
-
-  Default is `{}`.
-
-  Example:
-
-  ```hcl
-  user = {
-    name        = "marius"
-    description = "The guy from Berlin."
-  }
-  ```
-
-  The `user` object accepts the following attributes:
-
-  - [**`name`**](#attr-example_user_object-name): *(**Required** `string`)*<a name="attr-example_user_object-name"></a>
-
-    The name of the user
-
-  - [**`description`**](#attr-example_user_object-description): *(Optional `string`)*<a name="attr-example_user_object-description"></a>
-
-    A description describng the user in more detail
-
-    Default is `""`.
-
-### Module Configuration
+#### Module Configuration
 
 - [**`module_enabled`**](#var-module_enabled): *(Optional `bool`)*<a name="var-module_enabled"></a>
 
@@ -104,34 +80,17 @@ See [variables.tf] and [examples/] for details and use-cases.
 
   Default is `true`.
 
-- [**`module_tags`**](#var-module_tags): *(Optional `map(string)`)*<a name="var-module_tags"></a>
+- [**`module_timeouts`**](#var-module_timeouts): *(Optional `object(resource_name)`)*<a name="var-module_timeouts"></a>
 
-  A map of tags that will be applied to all created resources that accept tags.
-  Tags defined with `module_tags` can be overwritten by resource-specific tags.
+  How long certain operations (per resource type) ar allowed to take before being considered to have failed.
 
   Default is `{}`.
 
   Example:
 
   ```hcl
-  module_tags = {
-    environment = "staging"
-    team        = "platform"
-  }
-  ```
-
-- [**`module_timeouts`**](#var-module_timeouts): *(Optional `map(timeout)`)*<a name="var-module_timeouts"></a>
-
-  A map of timeout objects that is keyed by Terraform resource name
-  defining timeouts for `create`, `update` and `delete` Terraform operations.
-
-  Supported resources are: `null_resource`, ...
-
-  Example:
-
-  ```hcl
   module_timeouts = {
-    null_resource = {
+    google_compute_subnetwork = {
       create = "4m"
       update = "4m"
       delete = "4m"
@@ -139,24 +98,29 @@ See [variables.tf] and [examples/] for details and use-cases.
   }
   ```
 
-  Each `timeout` object in the map accepts the following attributes:
+  The `resource_name` object accepts the following attributes:
 
-  - [**`create`**](#attr-module_timeouts-create): *(Optional `string`)*<a name="attr-module_timeouts-create"></a>
+  - [**`google_compute_subnetwork`**](#attr-module_timeouts-google_compute_subnetwork): *(Optional `object(timeouts)`)*<a name="attr-module_timeouts-google_compute_subnetwork"></a>
 
-    Timeout for create operations.
+    Timeout for the `google_compute_subnetwork` resource.
 
-  - [**`update`**](#attr-module_timeouts-update): *(Optional `string`)*<a name="attr-module_timeouts-update"></a>
+    The `timeouts` object accepts the following attributes:
 
-    Timeout for update operations.
+    - [**`create`**](#attr-module_timeouts-google_compute_subnetwork-create): *(Optional `string`)*<a name="attr-module_timeouts-google_compute_subnetwork-create"></a>
 
-  - [**`delete`**](#attr-module_timeouts-delete): *(Optional `string`)*<a name="attr-module_timeouts-delete"></a>
+      Timeout for `create` operations.
 
-    Timeout for delete operations.
+    - [**`update`**](#attr-module_timeouts-google_compute_subnetwork-update): *(Optional `string`)*<a name="attr-module_timeouts-google_compute_subnetwork-update"></a>
+
+      Timeout for `update` operations.
+
+    - [**`delete`**](#attr-module_timeouts-google_compute_subnetwork-delete): *(Optional `string`)*<a name="attr-module_timeouts-google_compute_subnetwork-delete"></a>
+
+      Timeout for `delete` operations.
 
 - [**`module_depends_on`**](#var-module_depends_on): *(Optional `list(dependency)`)*<a name="var-module_depends_on"></a>
 
-  A list of dependencies.
-  Any object can be _assigned_ to this list to define a hidden external dependency.
+  A list of dependencies. Any object can be _assigned_ to this list to define a hidden external dependency.
 
   Default is `[]`.
 
@@ -164,9 +128,104 @@ See [variables.tf] and [examples/] for details and use-cases.
 
   ```hcl
   module_depends_on = [
-    null_resource.name
+    google_compute_network.vpc
   ]
   ```
+
+#### Main Resource Configuration
+
+- [**`project`**](#var-project): *(Optional `string`)*<a name="var-project"></a>
+
+  The ID of the project in which the resources belong. If it is not set, the provider project is used.
+
+- [**`network`**](#var-network): *(**Required** `string`)*<a name="var-network"></a>
+
+  The VPC network the subnets belong to. Only networks that are in the distributed mode can have subnetworks.
+
+- [**`name`**](#var-name): *(**Required** `string`)*<a name="var-name"></a>
+
+  The name of this subnetwork, provided by the client when initially creating the resource. The name must be 1-63 characters long, and comply with [RFC1035](https://datatracker.ietf.org/doc/html/rfc1035).
+
+  Specifically, the name must be 1-63 characters long and match the regular expression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash.
+
+- [**`description`**](#var-description): *(Optional `string`)*<a name="var-description"></a>
+
+  An optional description of this subnetwork. Provide this property when you create the resource. This field can be set only at resource creation time.
+
+- [**`region`**](#var-region): *(**Required** `string`)*<a name="var-region"></a>
+
+  The GCP region for this subnetwork.
+
+- [**`private_ip_google_access`**](#var-private_ip_google_access): *(Optional `bool`)*<a name="var-private_ip_google_access"></a>
+
+  When enabled, VMs in this subnetwork without external IP addresses can access Google APIs and services by using Private Google Access.
+
+  Default is `true`.
+
+- [**`ip_cidr_range`**](#var-ip_cidr_range): *(**Required** `string`)*<a name="var-ip_cidr_range"></a>
+
+  The range of internal addresses that are owned by this subnetwork. Provide this property when you create the subnetwork. For example, 10.0.0.0/8 or 192.168.0.0/16. Ranges must be unique and non-overlapping within a network. Only IPv4 is supported.
+
+- [**`secondary_ip_ranges`**](#var-secondary_ip_ranges): *(Optional `list(secondary_ip_range)`)*<a name="var-secondary_ip_ranges"></a>
+
+  An array of configurations for secondary IP ranges for VM instances contained in this subnetwork. The primary IP of such VM must belong to the primary ipCidrRange of the subnetwork. The alias IPs may belong to either primary or secondary ranges.
+
+  Example:
+
+  ```hcl
+  secondary_ip_range {
+    range_name    = "tf-test-secondary-range-update1"
+    ip_cidr_range = "192.168.10.0/24"
+  }
+  ```
+
+  Each `secondary_ip_range` object in the list accepts the following attributes:
+
+  - [**`range_name`**](#attr-secondary_ip_ranges-range_name): *(**Required** `string`)*<a name="attr-secondary_ip_ranges-range_name"></a>
+
+    The name associated with this subnetwork secondary range, used when adding an alias IP range to a VM instance. The name must be 1-63 characters long, and comply with RFC1035. The name must be unique within the subnetwork.
+
+  - [**`ip_cidr_range`**](#attr-secondary_ip_ranges-ip_cidr_range): *(**Required** `string`)*<a name="attr-secondary_ip_ranges-ip_cidr_range"></a>
+
+    The range of IP addresses belonging to this subnetwork secondary range. Provide this property when you create the subnetwork. Ranges must be unique and non-overlapping with all primary and secondary IP ranges within a network. Only `IPv4` is supported.
+
+- [**`log_config`**](#var-log_config): *(Optional `object(log_config)`)*<a name="var-log_config"></a>
+
+  Logging options for the subnetwork flow logs. Setting this value to 'null' will disable them. See https://www.terraform.io/docs/providers/google/r/compute_subnetwork.html for more information and examples.
+
+  Example:
+
+  ```hcl
+  log_config {
+    aggregation_interval = "INTERVAL_10_MIN"
+    flow_sampling        = 0.5
+    metadata             = "INCLUDE_ALL_METADATA"
+    metadata_fields      = "CUSTOM_METADATA"
+    filter_expr          = true
+  }
+  ```
+
+  The `log_config` object accepts the following attributes:
+
+  - [**`aggregation_interval`**](#attr-log_config-aggregation_interval): *(Optional `string`)*<a name="attr-log_config-aggregation_interval"></a>
+
+    Can only be specified if VPC flow logging for this subnetwork is enabled. Toggles the aggregation interval for collecting flow logs. Increasing the interval time will reduce the amount of generated flow logs for long lasting connections. Default is an interval of `5 seconds` per connection. Possible values are `INTERVAL_5_SEC`, `INTERVAL_30_SEC`, `INTERVAL_1_MIN`, `INTERVAL_5_MIN`, `INTERVAL_10_MIN`, and `INTERVAL_15_MIN`.
+
+  - [**`flow_sampling`**](#attr-log_config-flow_sampling): *(Optional `number`)*<a name="attr-log_config-flow_sampling"></a>
+
+    Can only be specified if VPC flow logging for this subnetwork is enabled. The value of the field must be in `[0, 1]`. Set the sampling rate of VPC flow logs within the subnetwork where `1.0` means all collected logs are reported and `0.0` means no logs are reported.
+
+  - [**`metadata`**](#attr-log_config-metadata): *(Optional `string`)*<a name="attr-log_config-metadata"></a>
+
+    Can only be specified if VPC flow logging for this subnetwork is `enabled`. Configures whether metadata fields should be added to the reported VPC flow logs. Possible values are `EXCLUDE_ALL_METADATA`, `INCLUDE_ALL_METADATA`, and `CUSTOM_METADATA`.
+
+  - [**`metadata_fields`**](#attr-log_config-metadata_fields): *(Optional `list(string)`)*<a name="attr-log_config-metadata_fields"></a>
+
+    List of metadata fields that should be added to reported logs. Can only be specified if VPC flow logs for this subnetwork is `enabled` and `"metadata"` is set to `CUSTOM_METADATA`.
+
+  - [**`filter_expr`**](#attr-log_config-filter_expr): *(Optional `string`)*<a name="attr-log_config-filter_expr"></a>
+
+    Export filter used to define which VPC flow logs should be logged, as as CEL expression. See https://cloud.google.com/vpc/docs/flow-logs#filtering for details on how to format this field.
 
 ## Module Outputs
 
@@ -176,24 +235,20 @@ The following attributes are exported in the outputs of the module:
 
   Whether this module is enabled.
 
-- [**`module_tags`**](#output-module_tags): *(`map(string)`)*<a name="output-module_tags"></a>
+- [**`subnetworks`**](#output-subnetworks): *(`map(subnetwork)`)*<a name="output-subnetworks"></a>
 
-  The map of tags that are being applied to all created resources that accept tags.
+  The created subnet resources.
 
 ## External Documentation
 
-### AWS Documentation IAM
+### Google Documentation
 
-- https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html
-- https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies.html
-- https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html
+- Configuring Private Google Access: <https://cloud.google.com/vpc/docs/configure-private-google-access>
+- Using VPC networks: <https://cloud.google.com/vpc/docs/using-vpc>
 
-### Terraform AWS Provider Documentation
+### Terraform Google Provider Documentation
 
-- https://www.terraform.io/docs/providers/aws/r/iam_role.html
-- https://www.terraform.io/docs/providers/aws/r/iam_role_policy.html
-- https://www.terraform.io/docs/providers/aws/r/iam_role_policy_attachment.html
-- https://www.terraform.io/docs/providers/aws/r/iam_instance_profile.html
+- <https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_subnetwork#flow_sampling>
 
 ## Module Versioning
 
@@ -205,7 +260,7 @@ Given a version number `MAJOR.MINOR.PATCH`, we increment the:
 2. `MINOR` version when we add functionality in a backwards compatible manner, and
 3. `PATCH` version when we make backwards compatible bug fixes.
 
-### Backwards compatibility in `0.0.z` and `0.y.z` version
+### Backwards compatibility in ` 0.0.z ` and ` 0.y.z ` version
 
 - Backwards compatibility in versions `0.0.z` is **not guaranteed** when `z` is increased. (Initial development)
 - Backwards compatibility in versions `0.y.z` is **not guaranteed** when `y` is increased. (Pre-release)
@@ -248,20 +303,27 @@ Copyright &copy; 2020-2022 [Mineiros GmbH][homepage]
 
 <!-- References -->
 
-[homepage]: https://mineiros.io/?ref=terraform-module-template
+[homepage]: https://mineiros.io/?ref=terraform-google-subnetwork
 [hello@mineiros.io]: mailto:hello@mineiros.io
+[badge-build]: https://github.com/mineiros-io/terraform-google-subnetwork/workflows/Tests/badge.svg
+[badge-semver]: https://img.shields.io/github/v/tag/mineiros-io/terraform-google-subnetwork.svg?label=latest&sort=semver
 [badge-license]: https://img.shields.io/badge/license-Apache%202.0-brightgreen.svg
+[badge-terraform]: https://img.shields.io/badge/Terraform-1.x-623CE4.svg?logo=terraform
+[badge-slack]: https://img.shields.io/badge/slack-@mineiros--community-f32752.svg?logo=slack
+[build-status]: https://github.com/mineiros-io/terraform-google-subnetwork/actions
+[releases-github]: https://github.com/mineiros-io/terraform-google-subnetwork/releases
 [releases-terraform]: https://github.com/hashicorp/terraform/releases
-[releases-aws-provider]: https://github.com/terraform-providers/terraform-provider-aws/releases
+[badge-tf-gcp]: https://img.shields.io/badge/google-3.x-1A73E8.svg?logo=terraform
+[releases-google-provider]: https://github.com/terraform-providers/terraform-provider-google/releases
 [apache20]: https://opensource.org/licenses/Apache-2.0
 [slack]: https://mineiros.io/slack
 [terraform]: https://www.terraform.io
-[aws]: https://aws.amazon.com/
+[gcp]: https://cloud.google.com/
 [semantic versioning (semver)]: https://semver.org/
-[variables.tf]: https://github.com/mineiros-io/terraform-module-template/blob/main/variables.tf
-[examples/]: https://github.com/mineiros-io/terraform-module-template/blob/main/examples
-[issues]: https://github.com/mineiros-io/terraform-module-template/issues
-[license]: https://github.com/mineiros-io/terraform-module-template/blob/main/LICENSE
-[makefile]: https://github.com/mineiros-io/terraform-module-template/blob/main/Makefile
-[pull requests]: https://github.com/mineiros-io/terraform-module-template/pulls
-[contribution guidelines]: https://github.com/mineiros-io/terraform-module-template/blob/main/CONTRIBUTING.md
+[variables.tf]: https://github.com/mineiros-io/terraform-google-subnetwork/blob/main/variables.tf
+[examples/]: https://github.com/mineiros-io/terraform-google-subnetwork/blob/main/examples
+[issues]: https://github.com/mineiros-io/terraform-google-subnetwork/issues
+[license]: https://github.com/mineiros-io/terraform-google-subnetwork/blob/main/LICENSE
+[makefile]: https://github.com/mineiros-io/terraform-google-subnetwork/blob/main/Makefile
+[pull requests]: https://github.com/mineiros-io/terraform-google-subnetwork/pulls
+[contribution guidelines]: https://github.com/mineiros-io/terraform-google-subnetwork/blob/main/CONTRIBUTING.md
