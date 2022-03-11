@@ -21,15 +21,14 @@ secure, and production-grade cloud infrastructure.
 - [Module Features](#module-features)
 - [Getting Started](#getting-started)
 - [Module Argument Reference](#module-argument-reference)
-  - [Top-level Arguments](#top-level-arguments)
-    - [Module Configuration](#module-configuration)
-    - [Main Resource Configuration](#main-resource-configuration)
+  - [Main Resource Configuration](#main-resource-configuration)
+  - [Module Configuration](#module-configuration)
 - [Module Outputs](#module-outputs)
 - [External Documentation](#external-documentation)
   - [Google Documentation](#google-documentation)
   - [Terraform Google Provider Documentation](#terraform-google-provider-documentation)
 - [Module Versioning](#module-versioning)
-  - [Backwards compatibility in ` 0.0.z ` and ` 0.y.z ` version](#backwards-compatibility-in--00z--and--0yz--version)
+  - [Backwards compatibility in `0.0.z` and `0.y.z` version](#backwards-compatibility-in-00z-and-0yz-version)
 - [About Mineiros](#about-mineiros)
 - [Reporting Issues](#reporting-issues)
 - [Contributing](#contributing)
@@ -38,19 +37,17 @@ secure, and production-grade cloud infrastructure.
 
 ## Module Features
 
-A [Terraform] module for creating `google_compute_subnetwork` resources
-which create subnets for a specified VPC. Each VPC network is subdivided
-into subnets, and each subnet is contained within a single region.
-You can have more than one subnet in a region for a given VPC network.
-If no `log_config` is specified `default_log_config` with best practices will be applied.
+This module implements the following Terraform resources:
+
+- `google_compute_subnetwork`
 
 ## Getting Started
 
-Most basic usage just setting required arguments:
+Most common usage of the module:
 
 ```hcl
   module "terraform-google-subnetwork" {
-    source        = "github.com/mineiros-io/terraform-google-subnetwork.git?ref=v0.1.0"
+    source        = "github.com/mineiros-io/terraform-google-subnetwork.git?ref=v0.0.1"
 
     network       = google_compute_network.custom-test.id
     name          = "test-subnetwork"
@@ -70,69 +67,7 @@ Most basic usage just setting required arguments:
 
 See [variables.tf] and [examples/] for details and use-cases.
 
-### Top-level Arguments
-
-#### Module Configuration
-
-- [**`module_enabled`**](#var-module_enabled): *(Optional `bool`)*<a name="var-module_enabled"></a>
-
-  Specifies whether resources in the module will be created.
-
-  Default is `true`.
-
-- [**`module_timeouts`**](#var-module_timeouts): *(Optional `object(resource_name)`)*<a name="var-module_timeouts"></a>
-
-  How long certain operations (per resource type) ar allowed to take before being considered to have failed.
-
-  Default is `{}`.
-
-  Example:
-
-  ```hcl
-  module_timeouts = {
-    google_compute_subnetwork = {
-      create = "4m"
-      update = "4m"
-      delete = "4m"
-    }
-  }
-  ```
-
-  The `resource_name` object accepts the following attributes:
-
-  - [**`google_compute_subnetwork`**](#attr-module_timeouts-google_compute_subnetwork): *(Optional `object(timeouts)`)*<a name="attr-module_timeouts-google_compute_subnetwork"></a>
-
-    Timeout for the `google_compute_subnetwork` resource.
-
-    The `timeouts` object accepts the following attributes:
-
-    - [**`create`**](#attr-module_timeouts-google_compute_subnetwork-create): *(Optional `string`)*<a name="attr-module_timeouts-google_compute_subnetwork-create"></a>
-
-      Timeout for `create` operations.
-
-    - [**`update`**](#attr-module_timeouts-google_compute_subnetwork-update): *(Optional `string`)*<a name="attr-module_timeouts-google_compute_subnetwork-update"></a>
-
-      Timeout for `update` operations.
-
-    - [**`delete`**](#attr-module_timeouts-google_compute_subnetwork-delete): *(Optional `string`)*<a name="attr-module_timeouts-google_compute_subnetwork-delete"></a>
-
-      Timeout for `delete` operations.
-
-- [**`module_depends_on`**](#var-module_depends_on): *(Optional `list(dependency)`)*<a name="var-module_depends_on"></a>
-
-  A list of dependencies. Any object can be _assigned_ to this list to define a hidden external dependency.
-
-  Default is `[]`.
-
-  Example:
-
-  ```hcl
-  module_depends_on = [
-    google_compute_network.vpc
-  ]
-  ```
-
-#### Main Resource Configuration
+### Main Resource Configuration
 
 - [**`project`**](#var-project): *(Optional `string`)*<a name="var-project"></a>
 
@@ -145,7 +80,6 @@ See [variables.tf] and [examples/] for details and use-cases.
 - [**`name`**](#var-name): *(**Required** `string`)*<a name="var-name"></a>
 
   The name of this subnetwork, provided by the client when initially creating the resource. The name must be 1-63 characters long, and comply with [RFC1035](https://datatracker.ietf.org/doc/html/rfc1035).
-
   Specifically, the name must be 1-63 characters long and match the regular expression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash.
 
 - [**`description`**](#var-description): *(Optional `string`)*<a name="var-description"></a>
@@ -227,6 +161,62 @@ See [variables.tf] and [examples/] for details and use-cases.
 
     Export filter used to define which VPC flow logs should be logged, as as CEL expression. See https://cloud.google.com/vpc/docs/flow-logs#filtering for details on how to format this field.
 
+### Module Configuration
+
+- [**`module_enabled`**](#var-module_enabled): *(Optional `bool`)*<a name="var-module_enabled"></a>
+
+  Specifies whether resources in the module will be created.
+
+  Default is `true`.
+
+- [**`module_timeouts`**](#var-module_timeouts): *(Optional `map(timeout)`)*<a name="var-module_timeouts"></a>
+
+  A map of timeout objects that is keyed by Terraform resource name
+  defining timeouts for `create`, `update` and `delete` Terraform operations.
+
+  Supported resources are: `null_resource`, ...
+
+  Example:
+
+  ```hcl
+  module_timeouts = {
+    null_resource = {
+      create = "4m"
+      update = "4m"
+      delete = "4m"
+    }
+  }
+  ```
+
+  Each `timeout` object in the map accepts the following attributes:
+
+  - [**`create`**](#attr-module_timeouts-create): *(Optional `string`)*<a name="attr-module_timeouts-create"></a>
+
+    Timeout for create operations.
+
+  - [**`update`**](#attr-module_timeouts-update): *(Optional `string`)*<a name="attr-module_timeouts-update"></a>
+
+    Timeout for update operations.
+
+  - [**`delete`**](#attr-module_timeouts-delete): *(Optional `string`)*<a name="attr-module_timeouts-delete"></a>
+
+    Timeout for delete operations.
+
+- [**`module_depends_on`**](#var-module_depends_on): *(Optional `list(dependency)`)*<a name="var-module_depends_on"></a>
+
+  A list of dependencies.
+  Any object can be _assigned_ to this list to define a hidden external dependency.
+
+  Default is `[]`.
+
+  Example:
+
+  ```hcl
+  module_depends_on = [
+    null_resource.name
+  ]
+  ```
+
 ## Module Outputs
 
 The following attributes are exported in the outputs of the module:
@@ -234,6 +224,10 @@ The following attributes are exported in the outputs of the module:
 - [**`module_enabled`**](#output-module_enabled): *(`bool`)*<a name="output-module_enabled"></a>
 
   Whether this module is enabled.
+
+- [**`module_tags`**](#output-module_tags): *(`map(string)`)*<a name="output-module_tags"></a>
+
+  The map of tags that are being applied to all created resources that accept tags.
 
 - [**`subnetwork`**](#output-subnetwork): *(`map(subnetwork)`)*<a name="output-subnetwork"></a>
 
@@ -260,7 +254,7 @@ Given a version number `MAJOR.MINOR.PATCH`, we increment the:
 2. `MINOR` version when we add functionality in a backwards compatible manner, and
 3. `PATCH` version when we make backwards compatible bug fixes.
 
-### Backwards compatibility in ` 0.0.z ` and ` 0.y.z ` version
+### Backwards compatibility in `0.0.z` and `0.y.z` version
 
 - Backwards compatibility in versions `0.0.z` is **not guaranteed** when `z` is increased. (Initial development)
 - Backwards compatibility in versions `0.y.z` is **not guaranteed** when `y` is increased. (Pre-release)
@@ -305,20 +299,13 @@ Copyright &copy; 2020-2022 [Mineiros GmbH][homepage]
 
 [homepage]: https://mineiros.io/?ref=terraform-google-subnetwork
 [hello@mineiros.io]: mailto:hello@mineiros.io
-[badge-build]: https://github.com/mineiros-io/terraform-google-subnetwork/workflows/Tests/badge.svg
-[badge-semver]: https://img.shields.io/github/v/tag/mineiros-io/terraform-google-subnetwork.svg?label=latest&sort=semver
 [badge-license]: https://img.shields.io/badge/license-Apache%202.0-brightgreen.svg
-[badge-terraform]: https://img.shields.io/badge/Terraform-1.x-623CE4.svg?logo=terraform
-[badge-slack]: https://img.shields.io/badge/slack-@mineiros--community-f32752.svg?logo=slack
-[build-status]: https://github.com/mineiros-io/terraform-google-subnetwork/actions
-[releases-github]: https://github.com/mineiros-io/terraform-google-subnetwork/releases
 [releases-terraform]: https://github.com/hashicorp/terraform/releases
-[badge-tf-gcp]: https://img.shields.io/badge/google-3.x-1A73E8.svg?logo=terraform
-[releases-google-provider]: https://github.com/terraform-providers/terraform-provider-google/releases
+[releases-aws-provider]: https://github.com/terraform-providers/terraform-provider-aws/releases
 [apache20]: https://opensource.org/licenses/Apache-2.0
 [slack]: https://mineiros.io/slack
 [terraform]: https://www.terraform.io
-[gcp]: https://cloud.google.com/
+[aws]: https://aws.amazon.com/
 [semantic versioning (semver)]: https://semver.org/
 [variables.tf]: https://github.com/mineiros-io/terraform-google-subnetwork/blob/main/variables.tf
 [examples/]: https://github.com/mineiros-io/terraform-google-subnetwork/blob/main/examples

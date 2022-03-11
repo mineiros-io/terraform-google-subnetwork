@@ -50,22 +50,20 @@ section {
   section {
     title   = "Module Features"
     content = <<-END
-      A [Terraform] module for creating `google_compute_subnetwork` resources
-      which create subnets for a specified VPC. Each VPC network is subdivided
-      into subnets, and each subnet is contained within a single region.
-      You can have more than one subnet in a region for a given VPC network.
-      If no `log_config` is specified `default_log_config` with best practices will be applied.
+      This module implements the following Terraform resources:
+
+      - `google_compute_subnetwork`
     END
   }
 
   section {
     title   = "Getting Started"
     content = <<-END
-      Most basic usage just setting required arguments:
+      Most common usage of the module:
 
       ```hcl
         module "terraform-google-subnetwork" {
-          source        = "github.com/mineiros-io/terraform-google-subnetwork.git?ref=v0.1.0"
+          source        = "github.com/mineiros-io/terraform-google-subnetwork.git?ref=v0.0.1"
 
           network       = google_compute_network.custom-test.id
           name          = "test-subnetwork"
@@ -90,173 +88,99 @@ section {
     END
 
     section {
-      title = "Top-level Arguments"
+      title = "Main Resource Configuration"
 
-      section {
-        title = "Module Configuration"
-
-        variable "module_enabled" {
-          type        = bool
-          description = <<-END
-            Specifies whether resources in the module will be created.
-          END
-          default     = true
-        }
-
-        variable "module_timeouts" {
-          type           = object(resource_name)
-          description    = <<-END
-            How long certain operations (per resource type) ar allowed to take before being considered to have failed.
-          END
-          default        = {}
-          readme_example = <<-END
-            module_timeouts = {
-              google_compute_subnetwork = {
-                create = "4m"
-                update = "4m"
-                delete = "4m"
-              }
-            }
-          END
-
-          attribute "google_compute_subnetwork" {
-            type        = object(timeouts)
-            description = <<-END
-              Timeout for the `google_compute_subnetwork` resource.
-            END
-
-            attribute "create" {
-              type        = string
-              description = <<-END
-                Timeout for `create` operations.
-              END
-            }
-
-            attribute "update" {
-              type        = string
-              description = <<-END
-                Timeout for `update` operations.
-              END
-            }
-
-            attribute "delete" {
-              type        = string
-              description = <<-END
-                Timeout for `delete` operations.
-              END
-            }
-          }
-        }
-
-        variable "module_depends_on" {
-          type           = list(dependency)
-          description    = <<-END
-            A list of dependencies. Any object can be _assigned_ to this list to define a hidden external dependency.
-          END
-          default        = []
-          readme_example = <<-END
-            module_depends_on = [
-              google_compute_network.vpc
-            ]
-          END
-        }
-      }
-
-      section {
-        title = "Main Resource Configuration"
-
-        variable "project" {
-          type        = string
-          description = <<-END
+      variable "project" {
+        type        = string
+        description = <<-END
             The ID of the project in which the resources belong. If it is not set, the provider project is used.
           END
-        }
+      }
 
-        variable "network" {
-          required    = true
-          type        = string
-          description = <<-END
+      variable "network" {
+        required    = true
+        type        = string
+        description = <<-END
             The VPC network the subnets belong to. Only networks that are in the distributed mode can have subnetworks.
           END
-        }
+      }
 
-        variable "name" {
-          required    = true
-          type        = string
-          description = <<-END
+      variable "name" {
+        required    = true
+        type        = string
+        description = <<-END
             The name of this subnetwork, provided by the client when initially creating the resource. The name must be 1-63 characters long, and comply with [RFC1035](https://datatracker.ietf.org/doc/html/rfc1035).
-
             Specifically, the name must be 1-63 characters long and match the regular expression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash.
-          END
-        }
+            END
+      }
 
-        variable "description" {
-          type        = string
-          description = <<-END
+      variable "description" {
+        type        = string
+        description = <<-END
               An optional description of this subnetwork. Provide this property when you create the resource. This field can be set only at resource creation time.
-          END
-        }
+            END
+      }
 
-        variable "region" {
-          required    = true
-          type        = string
-          description = <<-END
+      variable "region" {
+        required    = true
+        type        = string
+        description = <<-END
               The GCP region for this subnetwork.
-          END
-        }
+            END
+      }
 
-        variable "private_ip_google_access" {
-          type        = bool
-          default     = true
-          description = <<-END
+      variable "private_ip_google_access" {
+        type        = bool
+        default     = true
+        description = <<-END
               When enabled, VMs in this subnetwork without external IP addresses can access Google APIs and services by using Private Google Access.
-          END
-        }
+            END
+      }
 
-        variable "ip_cidr_range" {
-          required    = true
-          type        = string
-          description = <<-END
+      variable "ip_cidr_range" {
+        required    = true
+        type        = string
+        description = <<-END
               The range of internal addresses that are owned by this subnetwork. Provide this property when you create the subnetwork. For example, 10.0.0.0/8 or 192.168.0.0/16. Ranges must be unique and non-overlapping within a network. Only IPv4 is supported.
-          END
-        }
+            END
+      }
 
-        variable "secondary_ip_ranges" {
-          type           = list(secondary_ip_range)
-          description    = <<-END
+      variable "secondary_ip_ranges" {
+        type           = list(secondary_ip_range)
+        description    = <<-END
               An array of configurations for secondary IP ranges for VM instances contained in this subnetwork. The primary IP of such VM must belong to the primary ipCidrRange of the subnetwork. The alias IPs may belong to either primary or secondary ranges.
-          END
-          readme_example = <<-END
+            END
+        readme_example = <<-END
               secondary_ip_range {
                 range_name    = "tf-test-secondary-range-update1"
                 ip_cidr_range = "192.168.10.0/24"
               }
-          END
+            END
 
-          attribute "range_name" {
-            required    = true
-            type        = string
-            description = <<-END
+        attribute "range_name" {
+          required    = true
+          type        = string
+          description = <<-END
                 The name associated with this subnetwork secondary range, used when adding an alias IP range to a VM instance. The name must be 1-63 characters long, and comply with RFC1035. The name must be unique within the subnetwork.
-            END
-          }
-
-          attribute "ip_cidr_range" {
-            required    = true
-            type        = string
-            description = <<-END
-                The range of IP addresses belonging to this subnetwork secondary range. Provide this property when you create the subnetwork. Ranges must be unique and non-overlapping with all primary and secondary IP ranges within a network. Only `IPv4` is supported.
-            END
-          }
+              END
         }
 
-        variable "log_config" {
-          type           = object(log_config)
-          description    = <<-END
+        attribute "ip_cidr_range" {
+          required    = true
+          type        = string
+          description = <<-END
+                The range of IP addresses belonging to this subnetwork secondary range. Provide this property when you create the subnetwork. Ranges must be unique and non-overlapping with all primary and secondary IP ranges within a network. Only `IPv4` is supported.
+              END
+        }
+      }
+
+      variable "log_config" {
+        type           = object(log_config)
+        description    = <<-END
             Logging options for the subnetwork flow logs. Setting this value to 'null' will disable them. See https://www.terraform.io/docs/providers/google/r/compute_subnetwork.html for more information and examples.
           END
 
-          readme_example = <<-END
+        readme_example = <<-END
               log_config {
                 aggregation_interval = "INTERVAL_10_MIN"
                 flow_sampling        = 0.5
@@ -264,43 +188,108 @@ section {
                 metadata_fields      = "CUSTOM_METADATA"
                 filter_expr          = true
               }
-          END
+            END
 
-          attribute "aggregation_interval" {
-            type        = string
-            description = <<-END
+        attribute "aggregation_interval" {
+          type        = string
+          description = <<-END
                 Can only be specified if VPC flow logging for this subnetwork is enabled. Toggles the aggregation interval for collecting flow logs. Increasing the interval time will reduce the amount of generated flow logs for long lasting connections. Default is an interval of `5 seconds` per connection. Possible values are `INTERVAL_5_SEC`, `INTERVAL_30_SEC`, `INTERVAL_1_MIN`, `INTERVAL_5_MIN`, `INTERVAL_10_MIN`, and `INTERVAL_15_MIN`.
-            END
-          }
-
-          attribute "flow_sampling" {
-            type        = number
-            description = <<-END
-                Can only be specified if VPC flow logging for this subnetwork is enabled. The value of the field must be in `[0, 1]`. Set the sampling rate of VPC flow logs within the subnetwork where `1.0` means all collected logs are reported and `0.0` means no logs are reported.
-            END
-          }
-
-          attribute "metadata" {
-            type        = string
-            description = <<-END
-                Can only be specified if VPC flow logging for this subnetwork is `enabled`. Configures whether metadata fields should be added to the reported VPC flow logs. Possible values are `EXCLUDE_ALL_METADATA`, `INCLUDE_ALL_METADATA`, and `CUSTOM_METADATA`.
-            END
-          }
-
-          attribute "metadata_fields" {
-            type        = list(string)
-            description = <<-END
-                List of metadata fields that should be added to reported logs. Can only be specified if VPC flow logs for this subnetwork is `enabled` and `"metadata"` is set to `CUSTOM_METADATA`.
-            END
-          }
-
-          attribute "filter_expr" {
-            type        = string
-            description = <<-END
-                Export filter used to define which VPC flow logs should be logged, as as CEL expression. See https://cloud.google.com/vpc/docs/flow-logs#filtering for details on how to format this field.
-            END
-          }
+              END
         }
+
+        attribute "flow_sampling" {
+          type        = number
+          description = <<-END
+                Can only be specified if VPC flow logging for this subnetwork is enabled. The value of the field must be in `[0, 1]`. Set the sampling rate of VPC flow logs within the subnetwork where `1.0` means all collected logs are reported and `0.0` means no logs are reported.
+              END
+        }
+
+        attribute "metadata" {
+          type        = string
+          description = <<-END
+                Can only be specified if VPC flow logging for this subnetwork is `enabled`. Configures whether metadata fields should be added to the reported VPC flow logs. Possible values are `EXCLUDE_ALL_METADATA`, `INCLUDE_ALL_METADATA`, and `CUSTOM_METADATA`.
+              END
+        }
+
+        attribute "metadata_fields" {
+          type        = list(string)
+          description = <<-END
+                List of metadata fields that should be added to reported logs. Can only be specified if VPC flow logs for this subnetwork is `enabled` and `"metadata"` is set to `CUSTOM_METADATA`.
+              END
+        }
+
+        attribute "filter_expr" {
+          type        = string
+          description = <<-END
+                Export filter used to define which VPC flow logs should be logged, as as CEL expression. See https://cloud.google.com/vpc/docs/flow-logs#filtering for details on how to format this field.
+              END
+        }
+      }
+    }
+
+    section {
+      title = "Module Configuration"
+
+      variable "module_enabled" {
+        type        = bool
+        default     = true
+        description = <<-END
+          Specifies whether resources in the module will be created.
+        END
+      }
+
+      variable "module_timeouts" {
+        type           = map(timeout)
+        description    = <<-END
+          A map of timeout objects that is keyed by Terraform resource name
+          defining timeouts for `create`, `update` and `delete` Terraform operations.
+
+          Supported resources are: `null_resource`, ...
+        END
+        readme_example = <<-END
+          module_timeouts = {
+            null_resource = {
+              create = "4m"
+              update = "4m"
+              delete = "4m"
+            }
+          }
+        END
+
+        attribute "create" {
+          type        = string
+          description = <<-END
+            Timeout for create operations.
+          END
+        }
+
+        attribute "update" {
+          type        = string
+          description = <<-END
+            Timeout for update operations.
+          END
+        }
+
+        attribute "delete" {
+          type        = string
+          description = <<-END
+            Timeout for delete operations.
+          END
+        }
+      }
+
+      variable "module_depends_on" {
+        type           = list(dependency)
+        description    = <<-END
+          A list of dependencies.
+          Any object can be _assigned_ to this list to define a hidden external dependency.
+        END
+        default        = []
+        readme_example = <<-END
+          module_depends_on = [
+            null_resource.name
+          ]
+        END
       }
     }
   }
@@ -314,7 +303,14 @@ section {
     output "module_enabled" {
       type        = bool
       description = <<-END
-        Whether this module is enabled.
+          Whether this module is enabled.
+        END
+    }
+
+    output "module_tags" {
+      type        = map(string)
+      description = <<-END
+        The map of tags that are being applied to all created resources that accept tags.
       END
     }
 
@@ -422,37 +418,16 @@ references {
     value = "https://mineiros.io/?ref=terraform-google-subnetwork"
   }
   ref "hello@mineiros.io" {
-    value = "mailto:hello@mineiros.io"
-  }
-  ref "badge-build" {
-    value = "https://github.com/mineiros-io/terraform-google-subnetwork/workflows/Tests/badge.svg"
-  }
-  ref "badge-semver" {
-    value = "https://img.shields.io/github/v/tag/mineiros-io/terraform-google-subnetwork.svg?label=latest&sort=semver"
+    value = " mailto:hello@mineiros.io"
   }
   ref "badge-license" {
     value = "https://img.shields.io/badge/license-Apache%202.0-brightgreen.svg"
   }
-  ref "badge-terraform" {
-    value = "https://img.shields.io/badge/Terraform-1.x-623CE4.svg?logo=terraform"
-  }
-  ref "badge-slack" {
-    value = "https://img.shields.io/badge/slack-@mineiros--community-f32752.svg?logo=slack"
-  }
-  ref "build-status" {
-    value = "https://github.com/mineiros-io/terraform-google-subnetwork/actions"
-  }
-  ref "releases-github" {
-    value = "https://github.com/mineiros-io/terraform-google-subnetwork/releases"
-  }
   ref "releases-terraform" {
     value = "https://github.com/hashicorp/terraform/releases"
   }
-  ref "badge-tf-gcp" {
-    value = "https://img.shields.io/badge/google-3.x-1A73E8.svg?logo=terraform"
-  }
-  ref "releases-google-provider" {
-    value = "https://github.com/terraform-providers/terraform-provider-google/releases"
+  ref "releases-aws-provider" {
+    value = "https://github.com/terraform-providers/terraform-provider-aws/releases"
   }
   ref "apache20" {
     value = "https://opensource.org/licenses/Apache-2.0"
@@ -463,8 +438,8 @@ references {
   ref "terraform" {
     value = "https://www.terraform.io"
   }
-  ref "gcp" {
-    value = "https://cloud.google.com/"
+  ref "aws" {
+    value = "https://aws.amazon.com/"
   }
   ref "semantic versioning (semver)" {
     value = "https://semver.org/"
