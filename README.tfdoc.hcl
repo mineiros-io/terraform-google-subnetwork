@@ -187,14 +187,14 @@ section {
             The name of this subnetwork, provided by the client when initially creating the resource. The name must be 1-63 characters long, and comply with [RFC1035](https://datatracker.ietf.org/doc/html/rfc1035).
 
             Specifically, the name must be 1-63 characters long and match the regular expression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash.
-            END
+          END
         }
 
         variable "description" {
           type        = string
           description = <<-END
               An optional description of this subnetwork. Provide this property when you create the resource. This field can be set only at resource creation time.
-            END
+          END
         }
 
         variable "region" {
@@ -202,7 +202,7 @@ section {
           type        = string
           description = <<-END
               The GCP region for this subnetwork.
-            END
+          END
         }
 
         variable "private_ip_google_access" {
@@ -210,7 +210,7 @@ section {
           default     = true
           description = <<-END
               When enabled, VMs in this subnetwork without external IP addresses can access Google APIs and services by using Private Google Access.
-            END
+          END
         }
 
         variable "ip_cidr_range" {
@@ -218,27 +218,27 @@ section {
           type        = string
           description = <<-END
               The range of internal addresses that are owned by this subnetwork. Provide this property when you create the subnetwork. For example, 10.0.0.0/8 or 192.168.0.0/16. Ranges must be unique and non-overlapping within a network. Only IPv4 is supported.
-            END
+          END
         }
 
         variable "secondary_ip_ranges" {
           type           = list(secondary_ip_range)
           description    = <<-END
               An array of configurations for secondary IP ranges for VM instances contained in this subnetwork. The primary IP of such VM must belong to the primary ipCidrRange of the subnetwork. The alias IPs may belong to either primary or secondary ranges.
-            END
+          END
           readme_example = <<-END
               secondary_ip_range {
                 range_name    = "tf-test-secondary-range-update1"
                 ip_cidr_range = "192.168.10.0/24"
               }
-            END
+          END
 
           attribute "range_name" {
             required    = true
             type        = string
             description = <<-END
                 The name associated with this subnetwork secondary range, used when adding an alias IP range to a VM instance. The name must be 1-63 characters long, and comply with RFC1035. The name must be unique within the subnetwork.
-              END
+            END
           }
 
           attribute "ip_cidr_range" {
@@ -246,7 +246,7 @@ section {
             type        = string
             description = <<-END
                 The range of IP addresses belonging to this subnetwork secondary range. Provide this property when you create the subnetwork. Ranges must be unique and non-overlapping with all primary and secondary IP ranges within a network. Only `IPv4` is supported.
-              END
+            END
           }
         }
 
@@ -264,41 +264,41 @@ section {
                 metadata_fields      = "CUSTOM_METADATA"
                 filter_expr          = true
               }
-            END
+          END
 
           attribute "aggregation_interval" {
             type        = string
             description = <<-END
                 Can only be specified if VPC flow logging for this subnetwork is enabled. Toggles the aggregation interval for collecting flow logs. Increasing the interval time will reduce the amount of generated flow logs for long lasting connections. Default is an interval of `5 seconds` per connection. Possible values are `INTERVAL_5_SEC`, `INTERVAL_30_SEC`, `INTERVAL_1_MIN`, `INTERVAL_5_MIN`, `INTERVAL_10_MIN`, and `INTERVAL_15_MIN`.
-              END
+            END
           }
 
           attribute "flow_sampling" {
             type        = number
             description = <<-END
                 Can only be specified if VPC flow logging for this subnetwork is enabled. The value of the field must be in `[0, 1]`. Set the sampling rate of VPC flow logs within the subnetwork where `1.0` means all collected logs are reported and `0.0` means no logs are reported.
-              END
+            END
           }
 
           attribute "metadata" {
             type        = string
             description = <<-END
                 Can only be specified if VPC flow logging for this subnetwork is `enabled`. Configures whether metadata fields should be added to the reported VPC flow logs. Possible values are `EXCLUDE_ALL_METADATA`, `INCLUDE_ALL_METADATA`, and `CUSTOM_METADATA`.
-              END
+            END
           }
 
           attribute "metadata_fields" {
             type        = list(string)
             description = <<-END
                 List of metadata fields that should be added to reported logs. Can only be specified if VPC flow logs for this subnetwork is `enabled` and `"metadata"` is set to `CUSTOM_METADATA`.
-              END
+            END
           }
 
           attribute "filter_expr" {
             type        = string
             description = <<-END
                 Export filter used to define which VPC flow logs should be logged, as as CEL expression. See https://cloud.google.com/vpc/docs/flow-logs#filtering for details on how to format this field.
-              END
+            END
           }
         }
       }
@@ -358,7 +358,7 @@ section {
     END
 
     section {
-      title   = "Backwards compatibility in ` 0.0.z ` and ` 0.y.z ` version"
+      title   = "Backwards compatibility in `0.0.z` and `0.y.z` version"
       content = <<-END
         - Backwards compatibility in versions `0.0.z` is **not guaranteed** when `z` is increased. (Initial development)
         - Backwards compatibility in versions `0.y.z` is **not guaranteed** when `y` is increased. (Pre-release)
