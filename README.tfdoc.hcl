@@ -1,16 +1,16 @@
 header {
   image = "https://raw.githubusercontent.com/mineiros-io/brand/3bffd30e8bdbbde32c143e2650b2faa55f1df3ea/mineiros-primary-logo.svg"
-  url   = "https://mineiros.io/?ref=terraform-module-template"
+  url   = "https://mineiros.io/?ref=terraform-google-subnetwork"
 
   badge "build" {
-    image = "https://github.com/mineiros-io/terraform-module-template/workflows/Tests/badge.svg"
-    url   = "https://github.com/mineiros-io/terraform-module-template/actions"
+    image = "https://github.com/mineiros-io/terraform-google-subnetwork/workflows/Tests/badge.svg"
+    url   = "https://github.com/mineiros-io/terraform-google-subnetwork/actions"
     text  = "Build Status"
   }
 
   badge "semver" {
-    image = "https://img.shields.io/github/v/tag/mineiros-io/terraform-module-template.svg?label=latest&sort=semver"
-    url   = "https://github.com/mineiros-io/terraform-module-template/releases"
+    image = "https://img.shields.io/github/v/tag/mineiros-io/terraform-google-subnetwork.svg?label=latest&sort=semver"
+    url   = "https://github.com/mineiros-io/terraform-google-subnetwork/releases"
     text  = "GitHub tag (latest SemVer)"
   }
 
@@ -20,24 +20,11 @@ header {
     text  = "Terraform Version"
   }
 
-  # TODO: remove and enable gh or gcp provider badge
-  badge "tf-aws-provider" {
-    image = "https://img.shields.io/badge/AWS-3-F8991D.svg?logo=terraform"
-    url   = "https://github.com/terraform-providers/terraform-provider-aws/releases"
-    text  = "AWS Provider Version"
+  badge "tf-gcp-provider" {
+    image = "https://img.shields.io/badge/google-4-1A73E8.svg?logo=terraform"
+    url   = "https://github.com/terraform-providers/terraform-provider-google/releases"
+    text  = "Google Provider Version"
   }
-
-  # badge "tf-gh" {
-  #   image = "https://img.shields.io/badge/GH-4-F8991D.svg?logo=terraform"
-  #   url = "https://github.com/terraform-providers/terraform-provider-github/releases"
-  #   text = "Github Provider Version"
-  # }
-
-  # badge "tf-gcp-provider" {
-  #   image = "https://img.shields.io/badge/google-4-1A73E8.svg?logo=terraform"
-  #   url   = "https://github.com/terraform-providers/terraform-provider-google/releases"
-  #   text  = "Google Provider Version"
-  # }
 
   badge "slack" {
     image = "https://img.shields.io/badge/slack-@mineiros--community-f32752.svg?logo=slack"
@@ -47,13 +34,13 @@ header {
 }
 
 section {
-  title   = "terraform-module-template"
+  title   = "terraform-google-subnetwork"
   toc     = true
   content = <<-END
-    A [Terraform] module for [Amazon Web Services (AWS)][aws].
+    A [Terraform](https://www.terraform.io) module to create a [Google Network Subnet](https://cloud.google.com/vpc/docs/vpc#vpc_networks_and_subnets) on [Google Cloud Services (GCP)](https://cloud.google.com/).
 
     **_This module supports Terraform version 1
-    and is compatible with the Terraform AWS Provider version 3._**
+    and is compatible with the Terraform Google Provider version 4._**
 
     This module is part of our Infrastructure as Code (IaC) framework
     that enables our users and customers to easily deploy and manage reusable,
@@ -65,11 +52,7 @@ section {
     content = <<-END
       This module implements the following Terraform resources:
 
-      - `null_resource`
-
-      and supports additional features of the following modules:
-
-      - [mineiros-io/something/google](https://github.com/mineiros-io/terraform-google-something)
+      - `google_compute_subnetwork`
     END
   }
 
@@ -79,9 +62,21 @@ section {
       Most common usage of the module:
 
       ```hcl
-      module "terraform-module-template" {
-        source = "git@github.com:mineiros-io/terraform-module-template.git?ref=v0.0.1"
-      }
+        module "terraform-google-subnetwork" {
+          source        = "github.com/mineiros-io/terraform-google-subnetwork.git?ref=v0.0.1"
+
+          network       = google_compute_network.custom-test.id
+          name          = "test-subnetwork"
+          ip_cidr_range = "10.2.0.0/16"
+          region        = "us-central1"
+
+          secondary_ip_ranges = [
+            {
+              range_name    = "kubernetes-pods"
+              ip_cidr_range = "10.10.0.0/20"
+            }
+          ]
+        }
       ```
     END
   }
@@ -95,62 +90,142 @@ section {
     section {
       title = "Main Resource Configuration"
 
-      # please add main resource variables here
+      variable "project" {
+        type        = string
+        description = <<-END
+            The ID of the project in which the resources belong. If it is not set, the provider project is used.
+          END
+      }
 
-      # TODO: remove examples
-
-      ### Example of a required variable
-      variable "example_required" {
+      variable "network" {
         required    = true
         type        = string
         description = <<-END
-          The name of the resource
-        END
+            The ID of the VPC network the subnets belong to. Only networks that are in the distributed mode can have subnetworks.
+          END
       }
 
-      ### Example of an optional variable
-      variable "example_name" {
+      variable "name" {
+        required    = true
         type        = string
         description = <<-END
-          The name of the resource
-        END
-        default     = "optional-resource-name"
+            The name of this subnetwork, provided by the client when initially creating the resource. The name must be 1-63 characters long, and comply with [RFC1035](https://datatracker.ietf.org/doc/html/rfc1035).
+            Specifically, the name must be 1-63 characters long and match the regular expression `[a-z]([-a-z0-9]*[a-z0-9])?` which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash.
+            END
       }
 
-      ### Example of an object
-      variable "example_user_object" {
-        type           = object(user)
-        default        = {}
-        readme_example = <<-END
-          user = {
-            name        = "marius"
-            description = "The guy from Berlin."
-          }
-        END
+      variable "description" {
+        type        = string
+        description = <<-END
+              An optional description of this subnetwork. Provide this property when you create the resource. This field can be set only at resource creation time.
+            END
+      }
 
-        attribute "name" {
+      variable "region" {
+        required    = true
+        type        = string
+        description = <<-END
+              The GCP region for this subnetwork.
+            END
+      }
+
+      variable "private_ip_google_access" {
+        type        = bool
+        default     = true
+        description = <<-END
+            When enabled, VMs in this subnetwork without external IP addresses can access Google APIs and services by using Private Google Access.
+        END
+      }
+
+      variable "ip_cidr_range" {
+        required    = true
+        type        = string
+        description = <<-END
+              The range of internal addresses that are owned by this subnetwork. Provide this property when you create the subnetwork. For example, 10.0.0.0/8 or 192.168.0.0/16. Ranges must be unique and non-overlapping within a network. Only IPv4 is supported.
+            END
+      }
+
+      variable "secondary_ip_ranges" {
+        type           = list(secondary_ip_range)
+        description    = <<-END
+              An array of configurations for secondary IP ranges for VM instances contained in this subnetwork. The primary IP of such VM must belong to the primary ipCidrRange of the subnetwork. The alias IPs may belong to either primary or secondary ranges.
+            END
+        readme_example = <<-END
+              secondary_ip_range {
+                range_name    = "tf-test-secondary-range-update1"
+                ip_cidr_range = "192.168.10.0/24"
+              }
+            END
+
+        attribute "range_name" {
           required    = true
           type        = string
           description = <<-END
-            The name of the user
-          END
+                The name associated with this subnetwork secondary range, used when adding an alias IP range to a VM instance. The name must be 1-63 characters long, and comply with RFC1035. The name must be unique within the subnetwork.
+              END
         }
 
-        attribute "description" {
+        attribute "ip_cidr_range" {
+          required    = true
           type        = string
-          default     = ""
           description = <<-END
-            A description describng the user in more detail
+                The range of IP addresses belonging to this subnetwork secondary range. Provide this property when you create the subnetwork. Ranges must be unique and non-overlapping with all primary and secondary IP ranges within a network. Only `IPv4` is supported.
+              END
+        }
+      }
+
+      variable "log_config" {
+        type           = object(log_config)
+        description    = <<-END
+            Logging options for the subnetwork flow logs. Setting this value to 'null' will disable them. See https://www.terraform.io/docs/providers/google/r/compute_subnetwork.html for more information and examples.
           END
+
+        readme_example = <<-END
+              log_config {
+                aggregation_interval = "INTERVAL_10_MIN"
+                flow_sampling        = 0.5
+                metadata             = "INCLUDE_ALL_METADATA"
+                metadata_fields      = "CUSTOM_METADATA"
+                filter_expr          = true
+              }
+            END
+
+        attribute "aggregation_interval" {
+          type        = string
+          description = <<-END
+                Can only be specified if VPC flow logging for this subnetwork is enabled. Toggles the aggregation interval for collecting flow logs. Increasing the interval time will reduce the amount of generated flow logs for long lasting connections. Default is an interval of `5 seconds` per connection. Possible values are `INTERVAL_5_SEC`, `INTERVAL_30_SEC`, `INTERVAL_1_MIN`, `INTERVAL_5_MIN`, `INTERVAL_10_MIN`, and `INTERVAL_15_MIN`.
+              END
+        }
+
+        attribute "flow_sampling" {
+          type        = number
+          description = <<-END
+                Can only be specified if VPC flow logging for this subnetwork is enabled. The value of the field must be in `[0, 1]`. Set the sampling rate of VPC flow logs within the subnetwork where `1.0` means all collected logs are reported and `0.0` means no logs are reported.
+              END
+        }
+
+        attribute "metadata" {
+          type        = string
+          description = <<-END
+                Can only be specified if VPC flow logging for this subnetwork is `enabled`. Configures whether metadata fields should be added to the reported VPC flow logs. Possible values are `EXCLUDE_ALL_METADATA`, `INCLUDE_ALL_METADATA`, and `CUSTOM_METADATA`.
+              END
+        }
+
+        attribute "metadata_fields" {
+          type        = list(string)
+          description = <<-END
+                List of metadata fields that should be added to reported logs. Can only be specified if VPC flow logs for this subnetwork is `enabled` and `"metadata"` is set to `CUSTOM_METADATA`.
+              END
+        }
+
+        attribute "filter_expr" {
+          type        = string
+          description = <<-END
+                Export filter used to define which VPC flow logs should be logged, as as CEL expression. See https://cloud.google.com/vpc/docs/flow-logs#filtering for details on how to format this field.
+              END
         }
       }
     }
-
-    # section {
-    #   title = "Extended Resource Configuration"
-    #
-    #   # please uncomment and add extended resource variables here (resource not the main resource)
-    # }
 
     section {
       title = "Module Configuration"
@@ -163,23 +238,6 @@ section {
         END
       }
 
-      # TODO: remove if not needed
-      variable "module_tags" {
-        type           = map(string)
-        default        = {}
-        description    = <<-END
-          A map of tags that will be applied to all created resources that accept tags.
-          Tags defined with `module_tags` can be overwritten by resource-specific tags.
-        END
-        readme_example = <<-END
-          module_tags = {
-            environment = "staging"
-            team        = "platform"
-          }
-        END
-      }
-
-      # TODO: remove if not needed
       variable "module_timeouts" {
         type           = map(timeout)
         description    = <<-END
@@ -255,27 +313,30 @@ section {
         The map of tags that are being applied to all created resources that accept tags.
       END
     }
+
+    output "subnetwork" {
+      type        = map(subnetwork)
+      description = <<-END
+        The created subnet resource.
+      END
+    }
   }
 
   section {
     title = "External Documentation"
 
     section {
-      title   = "AWS Documentation IAM"
+      title   = "Google Documentation"
       content = <<-END
-        - https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html
-        - https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies.html
-        - https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html
+        - Configuring Private Google Access: <https://cloud.google.com/vpc/docs/configure-private-google-access>
+        - Using VPC networks: <https://cloud.google.com/vpc/docs/using-vpc>
       END
     }
 
     section {
-      title   = "Terraform AWS Provider Documentation"
+      title   = "Terraform Google Provider Documentation"
       content = <<-END
-        - https://www.terraform.io/docs/providers/aws/r/iam_role.html
-        - https://www.terraform.io/docs/providers/aws/r/iam_role_policy.html
-        - https://www.terraform.io/docs/providers/aws/r/iam_role_policy_attachment.html
-        - https://www.terraform.io/docs/providers/aws/r/iam_instance_profile.html
+        - <https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_subnetwork#flow_sampling>
       END
     }
   }
@@ -354,7 +415,7 @@ section {
 
 references {
   ref "homepage" {
-    value = "https://mineiros.io/?ref=terraform-module-template"
+    value = "https://mineiros.io/?ref=terraform-google-subnetwork"
   }
   ref "hello@mineiros.io" {
     value = " mailto:hello@mineiros.io"
@@ -384,24 +445,24 @@ references {
     value = "https://semver.org/"
   }
   ref "variables.tf" {
-    value = "https://github.com/mineiros-io/terraform-module-template/blob/main/variables.tf"
+    value = "https://github.com/mineiros-io/terraform-google-subnetwork/blob/main/variables.tf"
   }
   ref "examples/" {
-    value = "https://github.com/mineiros-io/terraform-module-template/blob/main/examples"
+    value = "https://github.com/mineiros-io/terraform-google-subnetwork/blob/main/examples"
   }
   ref "issues" {
-    value = "https://github.com/mineiros-io/terraform-module-template/issues"
+    value = "https://github.com/mineiros-io/terraform-google-subnetwork/issues"
   }
   ref "license" {
-    value = "https://github.com/mineiros-io/terraform-module-template/blob/main/LICENSE"
+    value = "https://github.com/mineiros-io/terraform-google-subnetwork/blob/main/LICENSE"
   }
   ref "makefile" {
-    value = "https://github.com/mineiros-io/terraform-module-template/blob/main/Makefile"
+    value = "https://github.com/mineiros-io/terraform-google-subnetwork/blob/main/Makefile"
   }
   ref "pull requests" {
-    value = "https://github.com/mineiros-io/terraform-module-template/pulls"
+    value = "https://github.com/mineiros-io/terraform-google-subnetwork/pulls"
   }
   ref "contribution guidelines" {
-    value = "https://github.com/mineiros-io/terraform-module-template/blob/main/CONTRIBUTING.md"
+    value = "https://github.com/mineiros-io/terraform-google-subnetwork/blob/main/CONTRIBUTING.md"
   }
 }
