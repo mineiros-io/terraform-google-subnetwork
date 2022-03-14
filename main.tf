@@ -11,13 +11,13 @@ resource "google_compute_subnetwork" "subnetwork" {
   network     = var.network
   region      = var.region
   name        = var.name
-  description = try(var.description, null)
+  description = var.description
 
-  private_ip_google_access = try(var.private_ip_google_access, true)
+  private_ip_google_access = var.private_ip_google_access
   ip_cidr_range            = cidrsubnet(var.ip_cidr_range, 0, 0)
 
   dynamic "secondary_ip_range" {
-    for_each = try(var.secondary_ip_ranges, [])
+    for_each = var.secondary_ip_ranges
 
     content {
       range_name    = secondary_ip_range.value.range_name
@@ -26,14 +26,14 @@ resource "google_compute_subnetwork" "subnetwork" {
   }
 
   dynamic "log_config" {
-    for_each = try(var.log_config, {})
+    for_each = var.log_config != null ? [var.log_config] : []
 
     content {
-      aggregation_interval = try(each.value.aggregation_interval, null)
-      flow_sampling        = try(each.value.flow_sampling, null)
-      metadata             = try(each.value.metadata, null)
-      metadata_fields      = try(each.value.metadata_fields, null)
-      filter_expr          = try(each.value.filter_expr, null)
+      aggregation_interval = try(log_config.aggregation_interval, null)
+      flow_sampling        = try(log_config.flow_sampling, null)
+      metadata             = try(log_config.metadata, null)
+      metadata_fields      = try(log_config.metadata_fields, null)
+      filter_expr          = try(log_config.filter_expr, null)
     }
   }
 
