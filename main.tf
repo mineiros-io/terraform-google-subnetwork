@@ -11,9 +11,9 @@ resource "google_compute_subnetwork" "subnetwork" {
   network     = var.network
   region      = var.region
   name        = var.name
-  description = try(var.description, null)
+  description = var.description
 
-  private_ip_google_access = try(var.private_ip_google_access, true)
+  private_ip_google_access = var.private_ip_google_access
   ip_cidr_range            = cidrsubnet(var.ip_cidr_range, 0, 0)
 
   dynamic "secondary_ip_range" {
@@ -38,7 +38,7 @@ resource "google_compute_subnetwork" "subnetwork" {
   }
 
   dynamic "timeouts" {
-    for_each = var.module_timeouts.google_compute_subnetwork
+    for_each = try([var.module_timeouts.google_compute_subnetwork], [])
 
     content {
       create = try(timeouts.value.create, null)
