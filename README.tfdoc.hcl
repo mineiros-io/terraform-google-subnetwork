@@ -101,7 +101,7 @@ section {
         required    = true
         type        = string
         description = <<-END
-            The VPC network the subnets belong to. Only networks that are in the distributed mode can have subnetworks.
+            The ID of the VPC network the subnets belong to. Only networks that are in the distributed mode can have subnetworks.
           END
       }
 
@@ -133,8 +133,8 @@ section {
         type        = bool
         default     = true
         description = <<-END
-              When enabled, VMs in this subnetwork without external IP addresses can access Google APIs and services by using Private Google Access.
-            END
+            When enabled, VMs in this subnetwork without external IP addresses can access Google APIs and services by using Private Google Access.
+        END
       }
 
       variable "ip_cidr_range" {

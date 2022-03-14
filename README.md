@@ -75,7 +75,7 @@ See [variables.tf] and [examples/] for details and use-cases.
 
 - [**`network`**](#var-network): *(**Required** `string`)*<a name="var-network"></a>
 
-  The VPC network the subnets belong to. Only networks that are in the distributed mode can have subnetworks.
+  The ID of the VPC network the subnets belong to. Only networks that are in the distributed mode can have subnetworks.
 
 - [**`name`**](#var-name): *(**Required** `string`)*<a name="var-name"></a>
 
