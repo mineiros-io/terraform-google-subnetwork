@@ -53,6 +53,10 @@ section {
       This module implements the following Terraform resources:
 
       - `google_compute_subnetwork`
+
+      and supports additional features of the following modules:
+
+      - [terraform-google-subnetwork-iam](https://github.com/mineiros-io/terraform-google-subnetwork-iam)
     END
   }
 
@@ -175,8 +179,8 @@ section {
       }
 
       variable "log_config" {
-        type           = object(log_config)
-        description    = <<-END
+        type        = object(log_config)
+        description = <<-END
             Logging options for the subnetwork flow logs. Setting this value to 'null' will disable them. See https://www.terraform.io/docs/providers/google/r/compute_subnetwork.html for more information and examples.
           END
 
@@ -226,6 +230,127 @@ section {
         }
       }
     }
+
+    section {
+      title = "Extended Resource Configuration"
+
+      variable "iam" {
+        type           = list(iam)
+        description    = <<-END
+          A list of IAM access.
+        END
+        readme_example = <<-END
+          iam = [{
+            role          = "roles/compute.networkUser"
+            members       = ["user:member@example.com"]
+            authoritative = false
+          }]
+        END
+
+        attribute "members" {
+          type        = set(string)
+          default     = []
+          description = <<-END
+            Identities that will be granted the privilege in role. Each entry can have one of the following values:
+            - `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account.
+            - `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account.
+            - `user:{emailid}`: An email address that represents a specific Google account. For example, alice@gmail.com or joe@example.com.
+            - `serviceAccount:{emailid}`: An email address that represents a service account. For example, my-other-app@appspot.gserviceaccount.com.
+            - `group:{emailid}`: An email address that represents a Google group. For example, admins@example.com.
+            - `domain:{domain}`: A G Suite domain (primary, instead of alias) name that represents all the users of that domain. For example, google.com or example.com.
+            - `projectOwner:projectid`: Owners of the given project. For example, `projectOwner:my-example-project`
+            - `projectEditor:projectid`: Editors of the given project. For example, `projectEditor:my-example-project`
+            - `projectViewer:projectid`: Viewers of the given project. For example, `projectViewer:my-example-project`
+          END
+        }
+
+        attribute "role" {
+          type        = string
+          description = <<-END
+            The role that should be applied. Note that custom roles must be of the format `[projects|organizations]/{parent-name}/roles/{role-name}`.
+          END
+        }
+
+        attribute "authoritative" {
+          type        = bool
+          default     = true
+          description = <<-END
+            Whether to exclusively set (authoritative mode) or add (non-authoritative/additive mode) members to the role.
+          END
+        }
+      }
+
+      variable "policy_bindings" {
+        type           = list(policy_binding)
+        description    = <<-END
+          A list of IAM policy bindings.
+        END
+        readme_example = <<-END
+          policy_bindings = [{
+            role      = "roles/compute.networkUser"
+            members   = ["user:member@example.com"]
+            condition = {
+              title       = "expires_after_2021_12_31"
+              description = "Expiring at midnight of 2021-12-31"
+              expression  = "request.time < timestamp(\"2022-01-01T00:00:00Z\")"
+            }
+          }]
+        END
+
+        attribute "role" {
+          required    = true
+          type        = string
+          description = <<-END
+            The role that should be applied.
+          END
+        }
+
+        attribute "members" {
+          type        = set(string)
+          default     = var.members
+          description = <<-END
+            Identities that will be granted the privilege in `role`.
+          END
+        }
+
+        attribute "condition" {
+          type           = object(condition)
+          description    = <<-END
+            An IAM Condition for a given binding.
+          END
+          readme_example = <<-END
+            condition = {
+              expression = "request.time < timestamp(\"2022-01-01T00:00:00Z\")"
+              title      = "expires_after_2021_12_31"
+            }
+          END
+
+          attribute "expression" {
+            required    = true
+            type        = string
+            description = <<-END
+              Textual representation of an expression in Common Expression Language syntax.
+            END
+          }
+
+          attribute "title" {
+            required    = true
+            type        = string
+            description = <<-END
+              A title for the expression, i.e. a short string describing its purpose.
+            END
+          }
+
+          attribute "description" {
+            type        = string
+            description = <<-END
+              An optional description of the expression. This is a longer text which describes the expression, e.g. when hovered over it in a UI.
+            END
+          }
+        }
+      }
+    }
+
 
     section {
       title = "Module Configuration"
