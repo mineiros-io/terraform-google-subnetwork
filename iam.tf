@@ -17,7 +17,7 @@ module "iam" {
 }
 
 module "policy_bindings" {
-  source = "github.com/mineiros-io/terraform-subnetwork-iam.git?ref=v0.0.1"
+  source = "github.com/mineiros-io/terraform-google-subnetwork-iam.git?ref=v0.0.1"
 
   count = var.policy_bindings != null ? 1 : 0
 
