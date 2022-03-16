@@ -330,6 +330,9 @@ section {
             type        = string
             description = <<-END
               Textual representation of an expression in Common Expression Language syntax.
+
+              You can find more information about the usage of Common Expression Language for IAM conditions
+              in the [official IAM Conditions documentation](https://cloud.google.com/iam/docs/conditions-overview#cel).
             END
           }
 

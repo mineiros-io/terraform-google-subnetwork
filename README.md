@@ -258,6 +258,9 @@ See [variables.tf] and [examples/] for details and use-cases.
 
       Textual representation of an expression in Common Expression Language syntax.
 
+      You can find more information about the usage of Common Expression Language for IAM conditions
+      in the [official IAM Conditions documentation](https://cloud.google.com/iam/docs/conditions-overview#cel).
+
     - [**`title`**](#attr-policy_bindings-condition-title): *(**Required** `string`)*<a name="attr-policy_bindings-condition-title"></a>
 
       A title for the expression, i.e. a short string describing its purpose.
