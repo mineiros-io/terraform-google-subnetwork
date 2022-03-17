@@ -29,11 +29,11 @@ resource "google_compute_subnetwork" "subnetwork" {
     for_each = var.log_config != null ? [var.log_config] : []
 
     content {
-      aggregation_interval = try(log_config.aggregation_interval, null)
-      flow_sampling        = try(log_config.flow_sampling, null)
-      metadata             = try(log_config.metadata, null)
-      metadata_fields      = try(log_config.metadata_fields, null)
-      filter_expr          = try(log_config.filter_expr, null)
+      aggregation_interval = try(log_config.value.aggregation_interval, null)
+      flow_sampling        = try(log_config.value.flow_sampling, null)
+      metadata             = try(log_config.value.metadata, null)
+      metadata_fields      = try(log_config.value.metadata_fields, null)
+      filter_expr          = try(log_config.value.filter_expr, null)
     }
   }
 
