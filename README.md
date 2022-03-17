@@ -282,7 +282,7 @@ See [variables.tf] and [examples/] for details and use-cases.
   A map of timeout objects that is keyed by Terraform resource name
   defining timeouts for `create`, `update` and `delete` Terraform operations.
 
-  Supported resources are: `null_resource`, ...
+  Supported resources are: `google_compute_subnetwork`,
 
   Example:
 
