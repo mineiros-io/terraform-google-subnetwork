@@ -372,7 +372,7 @@ section {
           A map of timeout objects that is keyed by Terraform resource name
           defining timeouts for `create`, `update` and `delete` Terraform operations.
 
-          Supported resources are: `null_resource`, ...
+          Supported resources are: `google_compute_subnetwork`,
         END
         readme_example = <<-END
           module_timeouts = {
