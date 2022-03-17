@@ -22,6 +22,7 @@ secure, and production-grade cloud infrastructure.
 - [Getting Started](#getting-started)
 - [Module Argument Reference](#module-argument-reference)
   - [Main Resource Configuration](#main-resource-configuration)
+  - [Extended Resource Configuration](#extended-resource-configuration)
   - [Module Configuration](#module-configuration)
 - [Module Outputs](#module-outputs)
 - [External Documentation](#external-documentation)
@@ -40,6 +41,10 @@ secure, and production-grade cloud infrastructure.
 This module implements the following Terraform resources:
 
 - `google_compute_subnetwork`
+
+and supports additional features of the following modules:
+
+- [terraform-google-subnetwork-iam](https://github.com/mineiros-io/terraform-google-subnetwork-iam)
 
 ## Getting Started
 
@@ -160,6 +165,109 @@ See [variables.tf] and [examples/] for details and use-cases.
   - [**`filter_expr`**](#attr-log_config-filter_expr): *(Optional `string`)*<a name="attr-log_config-filter_expr"></a>
 
     Export filter used to define which VPC flow logs should be logged, as as CEL expression. See https://cloud.google.com/vpc/docs/flow-logs#filtering for details on how to format this field.
+
+### Extended Resource Configuration
+
+- [**`iam`**](#var-iam): *(Optional `list(iam)`)*<a name="var-iam"></a>
+
+  A list of IAM access.
+
+  Example:
+
+  ```hcl
+  iam = [{
+    role          = "roles/compute.networkUser"
+    members       = ["user:member@example.com"]
+    authoritative = false
+  }]
+  ```
+
+  Each `iam` object in the list accepts the following attributes:
+
+  - [**`members`**](#attr-iam-members): *(Optional `set(string)`)*<a name="attr-iam-members"></a>
+
+    Identities that will be granted the privilege in role. Each entry can have one of the following values:
+    - `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account.
+    - `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account.
+    - `user:{emailid}`: An email address that represents a specific Google account. For example, alice@gmail.com or joe@example.com.
+    - `serviceAccount:{emailid}`: An email address that represents a service account. For example, my-other-app@appspot.gserviceaccount.com.
+    - `group:{emailid}`: An email address that represents a Google group. For example, admins@example.com.
+    - `domain:{domain}`: A G Suite domain (primary, instead of alias) name that represents all the users of that domain. For example, google.com or example.com.
+    - `projectOwner:projectid`: Owners of the given project. For example, `projectOwner:my-example-project`
+    - `projectEditor:projectid`: Editors of the given project. For example, `projectEditor:my-example-project`
+    - `projectViewer:projectid`: Viewers of the given project. For example, `projectViewer:my-example-project`
+
+    Default is `[]`.
+
+  - [**`role`**](#attr-iam-role): *(Optional `string`)*<a name="attr-iam-role"></a>
+
+    The role that should be applied. Note that custom roles must be of the format `[projects|organizations]/{parent-name}/roles/{role-name}`.
+
+  - [**`authoritative`**](#attr-iam-authoritative): *(Optional `bool`)*<a name="attr-iam-authoritative"></a>
+
+    Whether to exclusively set (authoritative mode) or add (non-authoritative/additive mode) members to the role.
+
+    Default is `true`.
+
+- [**`policy_bindings`**](#var-policy_bindings): *(Optional `list(policy_binding)`)*<a name="var-policy_bindings"></a>
+
+  A list of IAM policy bindings.
+
+  Example:
+
+  ```hcl
+  policy_bindings = [{
+    role      = "roles/compute.networkUser"
+    members   = ["user:member@example.com"]
+    condition = {
+      title       = "expires_after_2021_12_31"
+      description = "Expiring at midnight of 2021-12-31"
+      expression  = "request.time < timestamp(\"2022-01-01T00:00:00Z\")"
+    }
+  }]
+  ```
+
+  Each `policy_binding` object in the list accepts the following attributes:
+
+  - [**`role`**](#attr-policy_bindings-role): *(**Required** `string`)*<a name="attr-policy_bindings-role"></a>
+
+    The role that should be applied.
+
+  - [**`members`**](#attr-policy_bindings-members): *(Optional `set(string)`)*<a name="attr-policy_bindings-members"></a>
+
+    Identities that will be granted the privilege in `role`.
+
+    Default is `var.members`.
+
+  - [**`condition`**](#attr-policy_bindings-condition): *(Optional `object(condition)`)*<a name="attr-policy_bindings-condition"></a>
+
+    An IAM Condition for a given binding.
+
+    Example:
+
+    ```hcl
+    condition = {
+      expression = "request.time < timestamp(\"2022-01-01T00:00:00Z\")"
+      title      = "expires_after_2021_12_31"
+    }
+    ```
+
+    The `condition` object accepts the following attributes:
+
+    - [**`expression`**](#attr-policy_bindings-condition-expression): *(**Required** `string`)*<a name="attr-policy_bindings-condition-expression"></a>
+
+      Textual representation of an expression in Common Expression Language syntax.
+
+      You can find more information about the usage of Common Expression Language for IAM conditions
+      in the [official IAM Conditions documentation](https://cloud.google.com/iam/docs/conditions-overview#cel).
+
+    - [**`title`**](#attr-policy_bindings-condition-title): *(**Required** `string`)*<a name="attr-policy_bindings-condition-title"></a>
+
+      A title for the expression, i.e. a short string describing its purpose.
+
+    - [**`description`**](#attr-policy_bindings-condition-description): *(Optional `string`)*<a name="attr-policy_bindings-condition-description"></a>
+
+      An optional description of the expression. This is a longer text which describes the expression, e.g. when hovered over it in a UI.
 
 ### Module Configuration
 
