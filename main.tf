@@ -5,7 +5,7 @@
 # ---------------------------------------------------------------------------------------------------------------------
 
 resource "google_compute_subnetwork" "subnetwork" {
-  for_each = var.module_enabled ? 1 : 0
+  count = var.module_enabled ? 1 : 0
 
   project     = var.project
   network     = var.network
