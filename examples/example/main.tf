@@ -5,7 +5,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 module "terraform-google-subnetwork" {
-  source = "git@github.com:mineiros-io/terraform-google-subnetwork.git?ref=v0.0.1"
+  source = "git@github.com:mineiros-io/terraform-google-subnetwork.git?ref=v0.0.2"
 
   # All required module arguments
 

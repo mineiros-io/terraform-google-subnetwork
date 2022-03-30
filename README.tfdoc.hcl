@@ -67,7 +67,7 @@ section {
 
       ```hcl
         module "terraform-google-subnetwork" {
-          source        = "github.com/mineiros-io/terraform-google-subnetwork.git?ref=v0.0.1"
+          source        = "github.com/mineiros-io/terraform-google-subnetwork.git?ref=v0.0.2"
 
           network       = google_compute_network.custom-test.id
           name          = "test-subnetwork"
