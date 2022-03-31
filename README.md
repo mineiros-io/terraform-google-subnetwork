@@ -333,10 +333,6 @@ The following attributes are exported in the outputs of the module:
 
   Whether this module is enabled.
 
-- [**`module_tags`**](#output-module_tags): *(`map(string)`)*<a name="output-module_tags"></a>
-
-  The map of tags that are being applied to all created resources that accept tags.
-
 - [**`subnetwork`**](#output-subnetwork): *(`map(subnetwork)`)*<a name="output-subnetwork"></a>
 
   The created subnet resource.
