@@ -4,8 +4,8 @@
 # ---------------------------------------------------------------------------------------------------------------------
 
 variable "network" {
-  description = "(Required) The VPC network the subnets belong to. Only networks that are in the distributed mode can have subnetworks."
   type        = string
+  description = "(Required) The VPC network the subnets belong to. Only networks that are in the distributed mode can have subnetworks."
 }
 
 variable "name" {
@@ -41,11 +41,7 @@ variable "description" {
 }
 
 variable "secondary_ip_ranges" {
-  type = list(any)
-  # type = list(object({
-  #   range_name    = string
-  #   ip_cidr_range = string
-  # }))
+  type        = any
   description = "An array of configurations for secondary IP ranges for VM instances contained in this subnetwork. The primary IP of such VM must belong to the primary ipCidrRange of the subnetwork. The alias IPs may belong to either primary or secondary ranges."
   default     = []
 }
@@ -57,16 +53,9 @@ variable "project" {
 }
 
 variable "log_config" {
+  type        = any
   description = "(Optional) Logging options for the subnetwork flow logs. Setting this value to 'null' will disable them. See https://www.terraform.io/docs/providers/google/r/compute_subnetwork.html for more information and examples."
-  # type = object({
-  #   aggregation_interval = optional(string)
-  #   flow_sampling        = optional(number)
-  #   metadata             = optional(string)
-  #   metadata_fields      = optional(list(string))
-  #   filter_expr          = optional(string)
-  # })
-  type    = any
-  default = null
+  default     = null
 }
 
 ## IAM
@@ -119,16 +108,9 @@ variable "module_enabled" {
 }
 
 variable "module_timeouts" {
-  description = "(Optional) How long certain operations (per resource type) are allowed to take before being considered to have failed."
   type        = any
-  # type = object({
-  #   google_compute_subnetwork = optional(object({
-  #     create = optional(string)
-  #     update = optional(string)
-  #     delete = optional(string)
-  #   }))
-  # })
-  default = {}
+  description = "(Optional) How long certain operations (per resource type) are allowed to take before being considered to have failed."
+  default     = {}
 }
 
 variable "module_depends_on" {
