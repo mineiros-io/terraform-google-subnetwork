@@ -435,13 +435,6 @@ section {
         END
     }
 
-    output "module_tags" {
-      type        = map(string)
-      description = <<-END
-        The map of tags that are being applied to all created resources that accept tags.
-      END
-    }
-
     output "subnetwork" {
       type        = map(subnetwork)
       description = <<-END
