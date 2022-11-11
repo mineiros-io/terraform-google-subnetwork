@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Add support for `computed_members_map`
+- Add support for `iam.condition`
+
 ### Removed
 
 - BREAKING CHANGE: remove output `module_enabled`
