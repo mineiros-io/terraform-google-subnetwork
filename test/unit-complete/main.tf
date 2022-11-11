@@ -57,8 +57,8 @@ module "test" {
       authoritative = false
     },
     {
-      role    = "roles/editor"
-      members = ["computed:${module.test-sa.service_account.email}"]
+      roles   = ["roles/editor", "roles/browser"]
+      members = ["computed:computed_sa"]
     }
   ]
 

@@ -67,14 +67,14 @@ variable "iam" {
 
   # validate required keys in each object
   validation {
-    condition     = alltrue([for x in var.iam : length(setintersection(keys(x), ["role", "members"])) == 2])
-    error_message = "Each object in var.iam must specify a role and a set of members."
+    condition     = alltrue([for x in var.iam : length(setintersection(keys(x), ["role", "roles", "members"])) == 2])
+    error_message = "Each object in var.iam must specify a role or roles and a set of members."
   }
 
   # validate no invalid keys are in each object
   validation {
-    condition     = alltrue([for x in var.iam : length(setsubtract(keys(x), ["role", "members", "condition", "authoritative"])) == 0])
-    error_message = "Each object in var.iam does only support role, members, condition and authoritative attributes."
+    condition     = alltrue([for x in var.iam : length(setsubtract(keys(x), ["role", "roles", "members", "condition", "authoritative"])) == 0])
+    error_message = "Each object in var.iam does only support role, roles, members, condition and authoritative attributes."
   }
 }
 

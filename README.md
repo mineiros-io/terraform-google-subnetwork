@@ -204,6 +204,10 @@ See [variables.tf] and [examples/] for details and use-cases.
 
     The role that should be applied. Note that custom roles must be of the format `[projects|organizations]/{parent-name}/roles/{role-name}`.
 
+  - [**`roles`**](#attr-iam-roles): *(Optional `list(string)`)*<a name="attr-iam-roles"></a>
+
+    The set of roles that should be applied. Note that custom roles must be of the format `[projects|organizations]/{parent-name}/roles/{role-name}`.
+
   - [**`authoritative`**](#attr-iam-authoritative): *(Optional `bool`)*<a name="attr-iam-authoritative"></a>
 
     Whether to exclusively set (authoritative mode) or add (non-authoritative/additive mode) members to the role.

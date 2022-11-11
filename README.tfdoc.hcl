@@ -272,6 +272,13 @@ section {
           END
         }
 
+        attribute "roles" {
+          type        = list(string)
+          description = <<-END
+            The set of roles that should be applied. Note that custom roles must be of the format `[projects|organizations]/{parent-name}/roles/{role-name}`.
+          END
+        }
+
         attribute "authoritative" {
           type        = bool
           default     = true
