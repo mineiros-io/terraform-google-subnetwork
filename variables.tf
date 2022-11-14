@@ -67,14 +67,14 @@ variable "iam" {
 
   # validate required keys in each object
   validation {
-    condition     = alltrue([for x in var.iam : length(setintersection(keys(x), ["role", "members"])) == 2])
-    error_message = "Each object in var.iam must specify a role and a set of members."
+    condition     = alltrue([for x in var.iam : length(setintersection(keys(x), ["role", "roles", "members"])) == 2])
+    error_message = "Each object in var.iam must specify a role or roles and a set of members."
   }
 
   # validate no invalid keys are in each object
   validation {
-    condition     = alltrue([for x in var.iam : length(setsubtract(keys(x), ["role", "members", "authoritative"])) == 0])
-    error_message = "Each object in var.iam does only support role, members and authoritative attributes."
+    condition     = alltrue([for x in var.iam : length(setsubtract(keys(x), ["role", "roles", "members", "condition", "authoritative"])) == 0])
+    error_message = "Each object in var.iam does only support role, roles, members, condition and authoritative attributes."
   }
 }
 
@@ -93,6 +93,17 @@ variable "policy_bindings" {
   validation {
     condition     = var.policy_bindings == null ? true : alltrue([for x in var.policy_bindings : length(setsubtract(keys(x), ["role", "members", "condition"])) == 0])
     error_message = "Each object in var.policy_bindings does only support role, members and condition attributes."
+  }
+}
+
+variable "computed_members_map" {
+  type        = map(string)
+  description = "(Optional) A map of members to replace in 'members' to handle terraform computed values. Will be ignored when policy bindings are used."
+  default     = {}
+
+  validation {
+    condition     = alltrue([for k, v in var.computed_members_map : can(regex("^(allUsers|allAuthenticatedUsers|(user|serviceAccount|group|domain|projectOwner|projectEditor|projectViewer):)", v))])
+    error_message = "The value must be a non-empty list of strings where each entry is a valid principal type identified with `user:`, `serviceAccount:`, `group:`, `domain:`, `projectOwner:`, `projectEditor:` or `projectViewer:`."
   }
 }
 

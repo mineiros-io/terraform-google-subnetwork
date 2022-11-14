@@ -155,7 +155,7 @@ section {
               An array of configurations for secondary IP ranges for VM instances contained in this subnetwork. The primary IP of such VM must belong to the primary ipCidrRange of the subnetwork. The alias IPs may belong to either primary or secondary ranges.
             END
         readme_example = <<-END
-              secondary_ip_range {
+              secondary_ip_range = {
                 range_name    = "tf-test-secondary-range-update1"
                 ip_cidr_range = "192.168.10.0/24"
               }
@@ -185,7 +185,7 @@ section {
           END
 
         readme_example = <<-END
-              log_config {
+              log_config = {
                 aggregation_interval = "INTERVAL_10_MIN"
                 flow_sampling        = 0.5
                 metadata             = "INCLUDE_ALL_METADATA"
@@ -261,6 +261,7 @@ section {
             - `projectOwner:projectid`: Owners of the given project. For example, `projectOwner:my-example-project`
             - `projectEditor:projectid`: Editors of the given project. For example, `projectEditor:my-example-project`
             - `projectViewer:projectid`: Viewers of the given project. For example, `projectViewer:my-example-project`
+            - `computed:{identifier}`: An existing key from `var.computed_members_map`.
           END
         }
 
@@ -271,6 +272,13 @@ section {
           END
         }
 
+        attribute "roles" {
+          type        = list(string)
+          description = <<-END
+            The set of roles that should be applied. Note that custom roles must be of the format `[projects|organizations]/{parent-name}/roles/{role-name}`.
+          END
+        }
+
         attribute "authoritative" {
           type        = bool
           default     = true
@@ -278,6 +286,27 @@ section {
             Whether to exclusively set (authoritative mode) or add (non-authoritative/additive mode) members to the role.
           END
         }
+
+        attribute "condition" {
+          type           = object(condition)
+          description    = <<-END
+            An IAM Condition for a given binding.
+          END
+          readme_example = <<-END
+            condition = {
+              expression = "request.time < timestamp(\"2022-01-01T00:00:00Z\")"
+              title      = "expires_after_2021_12_31"
+            }
+          END
+        }
+      }
+
+      variable "computed_members_map" {
+        type        = map(string)
+        description = <<-END
+          A map of members to replace in `members` of various IAM settings to handle terraform computed values.
+        END
+        default     = {}
       }
 
       variable "policy_bindings" {
