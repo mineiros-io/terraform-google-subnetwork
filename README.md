@@ -52,7 +52,7 @@ Most common usage of the module:
 
 ```hcl
   module "terraform-google-subnetwork" {
-    source        = "github.com/mineiros-io/terraform-google-subnetwork.git?ref=v0.0.2"
+    source        = "github.com/mineiros-io/terraform-google-subnetwork.git?ref=v0.1.0"
 
     network       = google_compute_network.custom-test.id
     name          = "test-subnetwork"
