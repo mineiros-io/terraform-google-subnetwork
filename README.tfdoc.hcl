@@ -40,7 +40,7 @@ section {
     A [Terraform](https://www.terraform.io) module to create a [Google Network Subnet](https://cloud.google.com/vpc/docs/vpc#vpc_networks_and_subnets) on [Google Cloud Services (GCP)](https://cloud.google.com/).
 
     **_This module supports Terraform version 1
-    and is compatible with the Terraform Google Provider version 4._** and 5._**
+    and is compatible with the Terraform Google Provider version and 5.10+
 
     This module is part of our Infrastructure as Code (IaC) framework
     that enables our users and customers to easily deploy and manage reusable,
@@ -138,6 +138,60 @@ section {
         default     = true
         description = <<-END
             When enabled, VMs in this subnetwork without external IP addresses can access Google APIs and services by using Private Google Access.
+        END
+      }
+
+      variable "purpose" {
+        type        = string
+        default     = null
+        description = <<-END
+            (Optional) This field can be either PRIVATE_RFC_1918, REGIONAL_MANAGED_PROXY, 
+            GLOBAL_MANAGED_PROXY, PRIVATE_SERVICE_CONNECT or PRIVATE_NAT(Beta).
+            If unspecified, the purpose defaults to PRIVATE_RFC_1918.
+        END
+      }
+
+      variable "role" {
+        type        = string
+        default     = null
+        description = <<-END
+            The role of subnetwork. Currently, this field is only used when 
+            purpose is REGIONAL_MANAGED_PROXY. The value can be set to ACTIVE or BACKUP. 
+            An ACTIVE subnetwork is one that is currently being used for Envoy-based 
+            load balancers in a region. A BACKUP subnetwork is one that is ready to 
+            be promoted to ACTIVE or is currently draining.
+        END
+      }
+      variable "private_ipv6_google_access" {
+        type        = bool
+        default     = true
+        description = <<-END
+            The private IPv6 google access type for the VMs in this subnet.
+        END
+      }
+      variable "stack_type" {
+        type        = string
+        default     = null
+        description = <<-END
+            The stack type for this subnet to identify whether the IPv6 feature is enabled or not. 
+            If not specified IPV4_ONLY will be used. Possible values are: IPV4_ONLY, IPV4_IPV6.
+        END
+      }
+      variable "ipv6_access_type" {
+        type        = string
+        default     = null
+        description = <<-END
+            The access type of IPv6 address this subnet holds. 
+            It's immutable and can only be specified during creation or the first time the subnet is updated 
+            into IPV4_IPV6 dual stack. If the ipv6_type is EXTERNAL then this subnet cannot enable direct path. 
+            Possible values are: EXTERNAL, INTERNAL.
+        END
+      }
+      variable "external_ipv6_prefix" {
+        type        = string
+        default     = null
+        description = <<-END
+            The range of external IPv6 addresses that are owned by this subnetwork.
         END
       }
 

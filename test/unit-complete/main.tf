@@ -1,5 +1,5 @@
 module "test-sa" {
-  source = "github.com/mineiros-io/terraform-google-service-account?ref=v0.0.12"
+  source = "github.com/mineiros-io/terraform-google-service-account?ref=v0.2.1"
 
   account_id = "service-account-id-${local.random_suffix}"
 }
@@ -118,6 +118,28 @@ module "test2" {
   computed_members_map = {
     myserviceaccount = "serviceAccount:${module.test-sa.service_account.email}"
   }
+
+  module_depends_on = ["nothing"]
+}
+
+module "ipv6_regional_proxy" {
+  source = "../.."
+
+  module_enabled = true
+  name           = "test-subnetwork"
+
+  project       = local.project_id
+  network       = "projects/test-project/global/networks/test-network"
+  ip_cidr_range = "10.0.0.0/22"
+  region        = "us-west2"
+
+  stack_type       = "IPV4_IPV6"
+  ipv6_access_type = "EXTERNAL"
+
+  purpose                    = "REGIONAL_MANAGED_PROXY"
+  role                       = "BACKUP"
+  private_ipv6_google_access = true
+  external_ipv6_prefix       = "2001:db8:1234::/48"
 
   module_depends_on = ["nothing"]
 }

@@ -46,6 +46,42 @@ variable "secondary_ip_ranges" {
   default     = []
 }
 
+variable "purpose" {
+  type        = string
+  description = "The purpose of the resource. This field can be either PRIVATE_RFC_1918, REGIONAL_MANAGED_PROXY, GLOBAL_MANAGED_PROXY, PRIVATE_SERVICE_CONNECT or PRIVATE_NAT(Beta)."
+  default     = null
+}
+
+variable "role" {
+  type        = string
+  description = "The role of subnetwork. Currently, this field is only used when purpose is REGIONAL_MANAGED_PROXY. The value can be set to ACTIVE or BACKUP"
+  default     = null
+}
+
+variable "private_ipv6_google_access" {
+  type        = bool
+  description = "The private IPv6 google access type for the VMs in this subnet."
+  default     = null
+}
+
+variable "stack_type" {
+  type        = string
+  description = "The stack type for this subnet to identify whether the IPv6 feature is enabled or not. If not specified IPV4_ONLY will be used. Possible values are: IPV4_ONLY, IPV4_IPV6."
+  default     = null
+}
+
+variable "ipv6_access_type" {
+  type        = string
+  description = "The access type of IPv6 address this subnet holds. Possible values are: EXTERNAL, INTERNAL."
+  default     = null
+}
+
+variable "external_ipv6_prefix" {
+  type        = string
+  description = "The range of external IPv6 addresses that are owned by this subnetwork."
+  default     = null
+}
+
 variable "project" {
   type        = string
   description = "(Optional) The ID of the project in which the resources belong. If it is not set, the provider project is used."
