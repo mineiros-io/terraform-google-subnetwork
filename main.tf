@@ -13,8 +13,14 @@ resource "google_compute_subnetwork" "subnetwork" {
   name        = var.name
   description = var.description
 
-  private_ip_google_access = var.private_ip_google_access
-  ip_cidr_range            = cidrsubnet(var.ip_cidr_range, 0, 0)
+  ip_cidr_range              = cidrsubnet(var.ip_cidr_range, 0, 0)
+  purpose                    = try(var.purpose, null)
+  role                       = try(var.role, null)
+  private_ip_google_access   = var.private_ip_google_access
+  private_ipv6_google_access = try(var.private_ipv6_google_access, null)
+  stack_type                 = try(var.stack_type, null)
+  ipv6_access_type           = try(var.ipv6_access_type, null)
+  external_ipv6_prefix       = try(var.external_ipv6_prefix, null)
 
   dynamic "secondary_ip_range" {
     for_each = var.secondary_ip_ranges
